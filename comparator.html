@@ -492,5 +492,19 @@
 
 })();
 </script>
+
+<script>
+(function(){
+  function wdSendHeight(){
+    try{
+      var h = document.body.scrollHeight || document.documentElement.scrollHeight;
+      if(window.parent && window.parent!==window){ window.parent.postMessage({wdHeight:h}, "*"); }
+    }catch(e){}
+  }
+  window.addEventListener("load", wdSendHeight);
+  setInterval(wdSendHeight, 800);
+  document.addEventListener("click", function(){ setTimeout(wdSendHeight,300); });
+})();
+</script>
 </body>
 </html>

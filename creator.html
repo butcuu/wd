@@ -430,7 +430,21 @@
     '<section class="rsvp"><div class="leaf">❧</div><h2>Confirmă prezența</h2><p>Ne-ar bucura nespus să te avem alături.</p><div class="rsvp-deadline">'+ph(D.deadline,'')+'</div>'+
     '<div class="btns"><button class="btn-soft">Voi fi prezent(ă)</button><button class="btn-soft btn-ghost">Din păcate, nu pot ajunge</button></div></section>'+
     '<div class="footer"><div class="f-leaf">❧</div><div class="f-names">'+ph(D.mireasa,'Maria')+' &amp; '+ph(D.mire,'Andrei')+'</div><div class="f-date">'+dataText()+'</div></div>'+
-    '</div>'+cdScript()+'</body></html>';
+    '</div>'+cdScript()+'
+<script>
+(function(){
+  function wdSendHeight(){
+    try{
+      var h = document.body.scrollHeight || document.documentElement.scrollHeight;
+      if(window.parent && window.parent!==window){ window.parent.postMessage({wdHeight:h}, "*"); }
+    }catch(e){}
+  }
+  window.addEventListener("load", wdSendHeight);
+  setInterval(wdSendHeight, 800);
+  document.addEventListener("click", function(){ setTimeout(wdSendHeight,300); });
+})();
+</script>
+</body></html>';
   }
 
   // —————————————————— ȘABLON EDITORIAL NEUTRU ——————————————————
