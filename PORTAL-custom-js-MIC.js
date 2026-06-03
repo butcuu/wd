@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   WEDDING DIRECTION — Loader instrumente (v4 - inaltime stabila)
+   WEDDING DIRECTION — Loader instrumente (v5 - inaltime fixa, fara bucla)
    Courses > Settings > Advanced > Custom JavaScript
    ════════════════════════════════════════════════════════════ */
 (function(){
@@ -12,6 +12,14 @@
     "46f55aa5-48b0-4022-8161-5be7d1c9be34": "invitati.html",
     "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f": "comparator.html",
     "6cbbe44b-cf37-4ed6-90c4-faa054da52d3": "creator.html"
+  };
+  // inaltime fixa per instrument (px). Daca e mai inalt, scroll in interior.
+  var HEIGHT = {
+    "91ca406c-00bf-4a4c-ab24-f47971007e1c": 1100, // panou
+    "48ea5cab-c32f-4ccb-a6c3-ba959f723785": 1500, // buget
+    "46f55aa5-48b0-4022-8161-5be7d1c9be34": 1600, // invitati
+    "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f": 1600, // comparator
+    "6cbbe44b-cf37-4ed6-90c4-faa054da52d3": 2000  // creator
   };
 
   function getCid(){
@@ -43,25 +51,6 @@
     return document.body;
   }
 
-  var frames = {};
-  var lastH = {};
-  window.addEventListener("message", function(ev){
-    if(ev && ev.data && ev.data.wdHeight){
-      var newH = ev.data.wdHeight;
-      for(var id in frames){
-        var f = frames[id];
-        if(f && f.contentWindow === ev.source){
-          // aplic doar daca difera semnificativ (>8px) - opresc tremurul/bucla
-          var prev = lastH[id] || 0;
-          if(Math.abs(newH - prev) > 8 && newH > 100 && newH < 12000){
-            f.style.height = (newH + 16) + "px";
-            lastH[id] = newH;
-          }
-        }
-      }
-    }
-  });
-
   function inject(){
     var lid = currentLessonId();
     if(!lid || !TOOLS[lid]) return;
@@ -70,19 +59,19 @@
     var host = findHost();
     var cid = getCid();
     var src = GH + TOOLS[lid] + (cid ? ("?cid="+encodeURIComponent(cid)) : "");
+    var h = HEIGHT[lid] || 1400;
 
     var f = document.createElement("iframe");
     f.id = "wd-frame-"+lid;
     f.src = src;
-    f.style.cssText = "width:100%;border:0;display:block;height:700px;background:#fcf8f3;border-radius:12px;margin:10px 0;";
-    f.setAttribute("scrolling","no");
+    // inaltime FIXA, scroll permis in interior. Fara mesaje, fara bucla.
+    f.style.cssText = "width:100%;border:0;display:block;height:"+h+"px;background:#fcf8f3;border-radius:12px;margin:10px 0;";
     f.allow = "clipboard-write";
 
     if(host.firstChild) host.insertBefore(f, host.firstChild);
     else host.appendChild(f);
 
-    frames[lid] = f;
-    console.log("[WD] injectat:", TOOLS[lid], "cid:", cid||"(lipsa)");
+    console.log("[WD] injectat:", TOOLS[lid], h+"px", "cid:", cid||"(lipsa)");
   }
 
   function tryInject(){ setTimeout(inject, 600); }
@@ -90,8 +79,8 @@
 
   var lastPath = location.pathname;
   setInterval(function(){
-    if(location.pathname !== lastPath){ lastPath = location.pathname; frames={}; lastH={}; tryInject(); }
+    if(location.pathname !== lastPath){ lastPath = location.pathname; tryInject(); }
   }, 700);
 
-  console.log("[WD] loader pornit v4.");
+  console.log("[WD] loader pornit v5 (inaltime fixa).");
 })();
