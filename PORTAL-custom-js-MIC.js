@@ -32,18 +32,6 @@
     for(var i=0;i<sels.length;i++){ var e=document.querySelector(sels[i]); if(e) return e; }
     return document.body;
   }
-  var theFrame = null, lastApplied = 0;
-  window.addEventListener("message", function(ev){
-    if(!(ev && ev.data && ev.data.wdHeight && theFrame)) return;
-    if(theFrame.contentWindow !== ev.source) return;
-    var newH = ev.data.wdHeight;
-    if(newH < 150 || newH > 30000) return;
-    // urmaresc EXACT inaltimea continutului (nu adaug spatiu mare). Aplic doar daca difera >5px.
-    if(Math.abs(newH - lastApplied) > 5){
-      theFrame.style.height = newH + "px";
-      lastApplied = newH;
-    }
-  });
   function inject(){
     var lid = currentLessonId();
     if(!lid || !TOOLS[lid]) return;
@@ -60,12 +48,10 @@
     var f = document.createElement("iframe");
     f.id = "wd-frame-"+lid;
     f.src = src;
-    // pornesc de la o inaltime mica; snippetul din iframe o creste exact cat trebuie
-    f.style.cssText = "width:100%;border:0;display:block;height:600px;background:#fcf8f3;border-radius:12px;margin:0;";
-    f.setAttribute("scrolling","no");
+    f.style.cssText = "width:100%;border:0;display:block;height:2400px;background:#fcf8f3;border-radius:12px;margin:0;";
+    f.setAttribute("scrolling","yes");
     f.allow = "clipboard-write";
     host.insertBefore(f, host.firstChild);
-    theFrame = f; lastApplied = 600;
     setTimeout(function(){
       try { window.scrollTo({top:0, behavior:"smooth"}); } catch(e){ window.scrollTo(0,0); }
     }, 200);
@@ -74,6 +60,6 @@
   if(document.readyState!=="loading") tryInject(); else document.addEventListener("DOMContentLoaded", tryInject);
   var lastPath = location.pathname;
   setInterval(function(){
-    if(location.pathname !== lastPath){ lastPath = location.pathname; theFrame=null; lastApplied=0; tryInject(); }
+    if(location.pathname !== lastPath){ lastPath = location.pathname; tryInject(); }
   }, 700);
 })();
