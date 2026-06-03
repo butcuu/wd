@@ -15,16 +15,39 @@
   var D = { mireasa:'',mire:'',data:'',ora:'17:00',oras:'',cover:'',story:'',poveste:'',
     bisNume:'',bisOra:'',bisAdr:'',bisHarta:'',locNume:'',locOra:'',locAdr:'',locHarta:'',deadline:'',whatsapp:'' };
   var current = 'acuarela';
+  function wdDecode(raw){
+    if(!raw) return null;
+    // incerc mai multe variante de decodare (cu/fara decodeURIComponent, padding)
+    var tries = [];
+    try { tries.push(decodeURIComponent(raw)); } catch(e){}
+    tries.push(raw);
+    for(var i=0;i<tries.length;i++){
+      var s = tries[i];
+      // refac padding base64 daca lipseste
+      s = s.replace(/-/g,'+').replace(/_/g,'/');
+      while(s.length % 4) s += '=';
+      try {
+        var bin = atob(s);
+        // utf-8 decode
+        var json;
+        try { json = decodeURIComponent(escape(bin)); } catch(e){ json = bin; }
+        var p = JSON.parse(json);
+        if(p) return p;
+      } catch(e){}
+    }
+    return null;
+  }
   try {
     var hash = location.hash.replace(/^#/, '');
-    if(hash){
-      var json = decodeURIComponent(escape(atob(decodeURIComponent(hash))));
-      var payload = JSON.parse(json);
-      if(payload){
-        if(payload.date) D = Object.assign(D, payload.date);
-        else D = Object.assign(D, payload);
-        if(payload.sablon_ales) current = payload.sablon_ales;
-      }
+    var payload = wdDecode(hash);
+    if(payload){
+      if(payload.date) D = Object.assign(D, payload.date);
+      else D = Object.assign(D, payload);
+      if(payload.sablon_ales) current = payload.sablon_ales;
+      else if(payload.t) current = payload.t;  // compat vechi
+    } else {
+      document.getElementById('wd-viz').style.display='none';
+      document.getElementById('wd-err').style.display='block';
     }
   } catch(e){
     document.getElementById('wd-viz').style.display='none';
