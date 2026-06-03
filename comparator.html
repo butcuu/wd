@@ -495,26 +495,38 @@
 
 
 
+
+
 <script>
 (function(){
-  function wdH(){
-    try{
-      var h = Math.max(
-        document.body.scrollHeight, document.documentElement.scrollHeight,
-        document.body.offsetHeight, document.documentElement.offsetHeight
-      );
-      if(window.parent && window.parent!==window){
-        window.parent.postMessage({wdHeight:h}, "*");
-      }
-    }catch(e){}
+  var inIframe = (window.parent && window.parent !== window);
+  if(!inIframe) return;
+
+  // 1) cand sunt in iframe, barele fixed devin normale (nu mai plutesc)
+  var css = document.createElement("style");
+  css.textContent = ""
+    + "#wd-buget .savebar,#wd-creator .savebar,#wd-comp .savebar,"
+    + ".savebar{position:static !important;backdrop-filter:none !important;"
+    + "border-top:1px solid #e9e0d2;margin-top:20px;}";
+  document.head.appendChild(css);
+
+  // 2) masoara inaltime stabil
+  var last = 0, stable = 0;
+  function send(){
+    var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+    if(h === last){ stable++; } else { stable = 0; last = h; }
+    try{ window.parent.postMessage({wdHeight:h}, "*"); }catch(e){}
+    return stable;
   }
-  window.addEventListener("load", wdH);
-  window.addEventListener("resize", wdH);
-  document.addEventListener("click", function(){ setTimeout(wdH,250); setTimeout(wdH,600); });
-  document.addEventListener("input", function(){ setTimeout(wdH,250); });
-  // raportez periodic primele secunde (pana se randeaza tot)
-  var n=0, iv=setInterval(function(){ wdH(); if(++n>20) clearInterval(iv); }, 400);
-  setTimeout(wdH, 100); setTimeout(wdH, 1000); setTimeout(wdH, 2500);
+  window.addEventListener("load", function(){ setTimeout(send,100); });
+  // raportez la interactiune
+  document.addEventListener("click", function(){ setTimeout(send,200); setTimeout(send,500); });
+  document.addEventListener("input", function(){ setTimeout(send,300); });
+  // la pornire: raportez pana se stabilizeaza (max ~6 sec), apoi ma opresc
+  var n=0, iv=setInterval(function(){
+    var s = send();
+    if(s>=3 || ++n>30) clearInterval(iv);  // 3 masuratori egale = stabil
+  }, 300);
 })();
 </script>
 </body>

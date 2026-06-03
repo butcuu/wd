@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   WEDDING DIRECTION — Loader instrumente (v3 - auto-inaltime)
+   WEDDING DIRECTION — Loader instrumente (v4 - inaltime stabila)
    Courses > Settings > Advanced > Custom JavaScript
    ════════════════════════════════════════════════════════════ */
 (function(){
@@ -43,16 +43,20 @@
     return document.body;
   }
 
-  // asculta inaltimea de la TOATE iframe-urile WD si o aplica celui corect
   var frames = {};
+  var lastH = {};
   window.addEventListener("message", function(ev){
     if(ev && ev.data && ev.data.wdHeight){
-      // aplic noua inaltime iframe-ului care a trimis mesajul
+      var newH = ev.data.wdHeight;
       for(var id in frames){
         var f = frames[id];
         if(f && f.contentWindow === ev.source){
-          f.style.height = (ev.data.wdHeight + 20) + "px";
-          f.style.minHeight = "0";
+          // aplic doar daca difera semnificativ (>8px) - opresc tremurul/bucla
+          var prev = lastH[id] || 0;
+          if(Math.abs(newH - prev) > 8 && newH > 100 && newH < 12000){
+            f.style.height = (newH + 16) + "px";
+            lastH[id] = newH;
+          }
         }
       }
     }
@@ -70,8 +74,7 @@
     var f = document.createElement("iframe");
     f.id = "wd-frame-"+lid;
     f.src = src;
-    // pornesc de la o inaltime moderata; se ajusteaza din mesaj
-    f.style.cssText = "width:100%;border:0;display:block;height:700px;background:#fcf8f3;border-radius:12px;margin:10px 0;transition:height .2s;";
+    f.style.cssText = "width:100%;border:0;display:block;height:700px;background:#fcf8f3;border-radius:12px;margin:10px 0;";
     f.setAttribute("scrolling","no");
     f.allow = "clipboard-write";
 
@@ -87,8 +90,8 @@
 
   var lastPath = location.pathname;
   setInterval(function(){
-    if(location.pathname !== lastPath){ lastPath = location.pathname; frames={}; tryInject(); }
+    if(location.pathname !== lastPath){ lastPath = location.pathname; frames={}; lastH={}; tryInject(); }
   }, 700);
 
-  console.log("[WD] loader pornit.");
+  console.log("[WD] loader pornit v4.");
 })();
