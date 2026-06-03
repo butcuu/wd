@@ -518,33 +518,16 @@
 
 
 
+
+
 <script>
-/* WD: raportez inaltimea reala catre portal (mobil-friendly v3) */
 (function(){
   var lastSent = 0;
-  function calcH(){
-    var b = document.body, e = document.documentElement;
-    // masor inaltimea reala a continutului
-    var h = Math.max(
-      b.scrollHeight, b.offsetHeight,
-      e.scrollHeight, e.offsetHeight, e.clientHeight
-    );
-    // verific si ultimul element vizibil (footer/butoane), ca sa nu tai nimic
-    try {
-      var all = b.getElementsByTagName("*");
-      if(all.length){
-        var last = all[all.length-1];
-        var r = last.getBoundingClientRect();
-        var bottom = r.bottom + (window.pageYOffset||0);
-        if(bottom > h) h = bottom;
-      }
-    } catch(e2){}
-    return Math.ceil(h);
-  }
   function reportHeight(){
     try {
-      var h = calcH();
-      if (Math.abs(h - lastSent) > 12 && h > 100) {
+      // inaltimea reala a continutului paginii (simplu, fara bucle)
+      var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+      if (h > 100 && Math.abs(h - lastSent) > 10) {
         lastSent = h;
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ wdHeight: h }, "*");
@@ -552,19 +535,24 @@
       }
     } catch(e){}
   }
-  if (document.readyState === "complete") setTimeout(reportHeight, 150);
-  else window.addEventListener("load", function(){ setTimeout(reportHeight, 150); });
-  try {
-    if (window.ResizeObserver) {
-      var ro = new ResizeObserver(function(){ reportHeight(); });
-      ro.observe(document.body);
-      ro.observe(document.documentElement);
-    }
-  } catch(e){}
-  setInterval(reportHeight, 800);
-  document.addEventListener("click", function(){ setTimeout(reportHeight, 200); setTimeout(reportHeight, 500); });
-  document.addEventListener("input", function(){ setTimeout(reportHeight, 200); });
-  window.addEventListener("resize", function(){ setTimeout(reportHeight, 150); });
+  function start(){
+    reportHeight();
+    // raportez din nou dupa ce se aseaza fonturile/imaginile
+    setTimeout(reportHeight, 300);
+    setTimeout(reportHeight, 800);
+    setTimeout(reportHeight, 1500);
+    // observ schimbarile de continut (tab nou, rubrica adaugata, etc.)
+    try {
+      if (window.ResizeObserver) {
+        new ResizeObserver(function(){ reportHeight(); }).observe(document.documentElement);
+      }
+    } catch(e){}
+    // la interactiune (click/typing) reverific
+    document.addEventListener("click", function(){ setTimeout(reportHeight, 300); });
+    document.addEventListener("input", function(){ setTimeout(reportHeight, 300); });
+  }
+  if (document.readyState === "complete") start();
+  else window.addEventListener("load", start);
 })();
 </script>
 

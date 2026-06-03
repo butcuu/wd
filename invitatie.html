@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Invitație de nuntă</title>
-<style>body{margin:0;background:#fdf8f4;font-family:Georgia,serif}#wd-err{max-width:500px;margin:80px auto;text-align:center;padding:30px;color:#5a4a44}#wd-err h1{font-size:24px;margin-bottom:10px}</style>
 </head>
 <body>
-<div id="wd-viz"></div>
-<div id="wd-err" style="display:none"><h1>Invitație indisponibilă</h1><p>Linkul pare incomplet sau expirat. Cere mirilor un link nou.</p></div>
+<div id="wd-err" style="display:none;max-width:500px;margin:80px auto;text-align:center;padding:30px;color:#5a4a44;font-family:Georgia,serif"><h1>Invitație indisponibilă</h1><p>Linkul pare incomplet. Cere mirilor un link nou.</p></div>
 <script>
 (function(){
   "use strict";
@@ -17,41 +15,20 @@
   var current = 'acuarela';
   function wdDecode(raw){
     if(!raw) return null;
-    // incerc mai multe variante de decodare (cu/fara decodeURIComponent, padding)
     var tries = [];
     try { tries.push(decodeURIComponent(raw)); } catch(e){}
     tries.push(raw);
     for(var i=0;i<tries.length;i++){
-      var s = tries[i];
-      // refac padding base64 daca lipseste
-      s = s.replace(/-/g,'+').replace(/_/g,'/');
+      var s = tries[i].replace(/-/g,'+').replace(/_/g,'/');
       while(s.length % 4) s += '=';
       try {
         var bin = atob(s);
-        // utf-8 decode
-        var json;
-        try { json = decodeURIComponent(escape(bin)); } catch(e){ json = bin; }
+        var json; try { json = decodeURIComponent(escape(bin)); } catch(e){ json = bin; }
         var p = JSON.parse(json);
         if(p) return p;
       } catch(e){}
     }
     return null;
-  }
-  try {
-    var hash = location.hash.replace(/^#/, '');
-    var payload = wdDecode(hash);
-    if(payload){
-      if(payload.date) D = Object.assign(D, payload.date);
-      else D = Object.assign(D, payload);
-      if(payload.sablon_ales) current = payload.sablon_ales;
-      else if(payload.t) current = payload.t;  // compat vechi
-    } else {
-      document.getElementById('wd-viz').style.display='none';
-      document.getElementById('wd-err').style.display='block';
-    }
-  } catch(e){
-    document.getElementById('wd-viz').style.display='none';
-    document.getElementById('wd-err').style.display='block';
   }
 
 var PH_COVER='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="900"><rect width="800" height="900" fill="#e9e0d2"/><text x="400" y="450" font-family="Georgia" font-size="34" fill="#b8a98c" text-anchor="middle">Poza voastră</text></svg>');
@@ -85,6 +62,10 @@ function commonHead(fonts){
 function cdScript(){
     var iso=dataIso();
     return '<script>(function(){var wd="'+iso+'";function t(){if(!/^\\d{4}-\\d{2}-\\d{2}/.test(wd))return;var df=new Date(wd)-new Date();if(df<0)df=0;var d=Math.floor(df/864e5),h=Math.floor(df%864e5/36e5),m=Math.floor(df%36e5/6e4);document.querySelectorAll("[data-cd=d]").forEach(function(e){e.textContent=d});document.querySelectorAll("[data-cd=h]").forEach(function(e){e.textContent=h});document.querySelectorAll("[data-cd=m]").forEach(function(e){e.textContent=m})}t();setInterval(t,6e4);})();<\/scr'+'ipt>';
+  }
+
+function sprigSvg(){
+    return '<svg class="sprig" viewBox="0 0 60 30" fill="none" style="margin-bottom:16px"><path d="M30 28V6" stroke="currentColor" stroke-width="1"/><path d="M30 14c-4-2-8-1-11-4M30 14c4-2 8-1 11-4M30 20c-3-1.5-6-1-8.5-3M30 20c3-1.5 6-1 8.5-3M30 8c-2-1-4-3-4-6M30 8c2-1 4-3 4-6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="30" cy="4" r="2" fill="currentColor"/></svg>';
   }
 
 function tplAcuarela(){
@@ -273,14 +254,33 @@ function tplSalvie(){
   }
 var TEMPLATES={acuarela:tplAcuarela,editorial:tplEditorial,salvie:tplSalvie};
 
-  try {
-    var fn = TEMPLATES[current] || TEMPLATES.acuarela;
-    var fullHtml = fn();
-    document.open(); document.write(fullHtml); document.close();
-  } catch(e){
-    var v=document.getElementById('wd-viz'); if(v) v.style.display='none';
-    var er=document.getElementById('wd-err'); if(er) er.style.display='block';
+  var hash = location.hash.replace(/^#/, '');
+  var payload = wdDecode(hash);
+  if(payload){
+    // FORMAT NOU: { sablon_ales, date:{ mireasa, mire, ... } }
+    if(payload.date){
+      D = Object.assign(D, payload.date);
+      if(payload.sablon_ales) current = payload.sablon_ales;
+    } else {
+      // FORMAT VECHI: chei scurte { t, a, b, c, o, r, p, e, f, g, h, i, j, k, l, m, w }
+      var map={a:'mireasa',b:'mire',c:'data',o:'ora',r:'oras',p:'poveste',
+               e:'bisNume',f:'bisOra',g:'bisAdr',h:'bisHarta',
+               i:'locNume',j:'locOra',k:'locAdr',l:'locHarta',m:'deadline',w:'whatsapp',
+               cover:'cover',story:'story'};
+      for(var k in map){ if(payload[k]!==undefined && payload[k]!=='') D[map[k]]=payload[k]; }
+      // model: t (vechi) sau sablon_ales (nou)
+      if(payload.t) current = payload.t;
+      else if(payload.sablon_ales) current = payload.sablon_ales;
+      // daca payload are deja chei lungi (alt format), le iau direct
+      if(payload.mireasa) D = Object.assign(D, payload);
+    }
   }
+  if(payload){
+    try {
+      var fn = TEMPLATES[current] || TEMPLATES.acuarela;
+      document.open(); document.write(fn()); document.close();
+    } catch(e){ document.getElementById('wd-err').style.display='block'; }
+  } else { document.getElementById('wd-err').style.display='block'; }
 })();
 </script>
 </body>
