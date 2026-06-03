@@ -207,17 +207,28 @@
 })();
 </script>
 
+
+
 <script>
 (function(){
-  function wdSendHeight(){
+  function wdH(){
     try{
-      var h = document.body.scrollHeight || document.documentElement.scrollHeight;
-      if(window.parent && window.parent!==window){ window.parent.postMessage({wdHeight:h}, "*"); }
+      var h = Math.max(
+        document.body.scrollHeight, document.documentElement.scrollHeight,
+        document.body.offsetHeight, document.documentElement.offsetHeight
+      );
+      if(window.parent && window.parent!==window){
+        window.parent.postMessage({wdHeight:h}, "*");
+      }
     }catch(e){}
   }
-  window.addEventListener("load", wdSendHeight);
-  setInterval(wdSendHeight, 800);
-  document.addEventListener("click", function(){ setTimeout(wdSendHeight,300); });
+  window.addEventListener("load", wdH);
+  window.addEventListener("resize", wdH);
+  document.addEventListener("click", function(){ setTimeout(wdH,250); setTimeout(wdH,600); });
+  document.addEventListener("input", function(){ setTimeout(wdH,250); });
+  // raportez periodic primele secunde (pana se randeaza tot)
+  var n=0, iv=setInterval(function(){ wdH(); if(++n>20) clearInterval(iv); }, 400);
+  setTimeout(wdH, 100); setTimeout(wdH, 1000); setTimeout(wdH, 2500);
 })();
 </script>
 </body>

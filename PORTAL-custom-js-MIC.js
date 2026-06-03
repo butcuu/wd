@@ -1,8 +1,6 @@
 /* ════════════════════════════════════════════════════════════
-   WEDDING DIRECTION — Loader instrumente zona de membri
-   Se pune in: Courses > Settings > Advanced > Custom JavaScript
-   Detecteaza lectia (dupa ID), incarca instrumentul de pe GitHub
-   intr-un iframe, ii paseaza cid-ul miresei (din Firebase).
+   WEDDING DIRECTION — Loader instrumente (v3 - auto-inaltime)
+   Courses > Settings > Advanced > Custom JavaScript
    ════════════════════════════════════════════════════════════ */
 (function(){
   "use strict";
@@ -16,7 +14,6 @@
     "6cbbe44b-cf37-4ed6-90c4-faa054da52d3": "creator.html"
   };
 
-  // cid-ul miresei din token Firebase (portalul are Firebase, il citim aici)
   function getCid(){
     try{
       for(var i=0;i<localStorage.length;i++){
@@ -35,43 +32,63 @@
 
   function currentLessonId(){
     var m = location.pathname.match(/posts\/([0-9a-f\-]{36})/i);
-    if(m) return m[1];
-    var q = new URLSearchParams(location.search).get("post");
-    return q || null;
+    return m ? m[1] : null;
   }
+
+  function findHost(){
+    var sels = [".post-content",".lesson-content",".course-post-content",
+      "[class*=post-body]","[class*=postContent]","[class*=lesson]",
+      "[class*=PostContent]","[class*=content-area]",".content","main","#main"];
+    for(var i=0;i<sels.length;i++){ var e=document.querySelector(sels[i]); if(e) return e; }
+    return document.body;
+  }
+
+  // asculta inaltimea de la TOATE iframe-urile WD si o aplica celui corect
+  var frames = {};
+  window.addEventListener("message", function(ev){
+    if(ev && ev.data && ev.data.wdHeight){
+      // aplic noua inaltime iframe-ului care a trimis mesajul
+      for(var id in frames){
+        var f = frames[id];
+        if(f && f.contentWindow === ev.source){
+          f.style.height = (ev.data.wdHeight + 20) + "px";
+          f.style.minHeight = "0";
+        }
+      }
+    }
+  });
 
   function inject(){
     var lid = currentLessonId();
     if(!lid || !TOOLS[lid]) return;
     if(document.getElementById("wd-frame-"+lid)) return;
 
-    var host = document.querySelector(".post-content, .lesson-content, .course-post-content, [class*=post-body], main") || document.body;
-
+    var host = findHost();
     var cid = getCid();
     var src = GH + TOOLS[lid] + (cid ? ("?cid="+encodeURIComponent(cid)) : "");
 
     var f = document.createElement("iframe");
     f.id = "wd-frame-"+lid;
     f.src = src;
-    f.style.cssText = "width:100%;border:0;display:block;min-height:1400px;background:#fcf8f3;";
+    // pornesc de la o inaltime moderata; se ajusteaza din mesaj
+    f.style.cssText = "width:100%;border:0;display:block;height:700px;background:#fcf8f3;border-radius:12px;margin:10px 0;transition:height .2s;";
     f.setAttribute("scrolling","no");
     f.allow = "clipboard-write";
 
-    host.appendChild(f);
+    if(host.firstChild) host.insertBefore(f, host.firstChild);
+    else host.appendChild(f);
 
-    // ajustez inaltimea iframe-ului la continut (mesaj de la pagina copil)
-    window.addEventListener("message", function(ev){
-      if(ev && ev.data && ev.data.wdHeight && f){
-        f.style.minHeight = (ev.data.wdHeight + 40) + "px";
-      }
-    });
+    frames[lid] = f;
+    console.log("[WD] injectat:", TOOLS[lid], "cid:", cid||"(lipsa)");
   }
 
-  function tryInject(){ setTimeout(inject, 500); }
+  function tryInject(){ setTimeout(inject, 600); }
   if(document.readyState!=="loading") tryInject(); else document.addEventListener("DOMContentLoaded", tryInject);
 
   var lastPath = location.pathname;
   setInterval(function(){
-    if(location.pathname !== lastPath){ lastPath = location.pathname; tryInject(); }
-  }, 600);
+    if(location.pathname !== lastPath){ lastPath = location.pathname; frames={}; tryInject(); }
+  }, 700);
+
+  console.log("[WD] loader pornit.");
 })();
