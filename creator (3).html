@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Creează-ți invitația de nuntă</title>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     PANEL LIVE — CREATOR DE INVITAȚII DE NUNTĂ (Wedding Direction)
+     Mireasa completează datele O DATĂ (sus), vede LIVE pe cele 3 șabloane,
+     alege unul și trimite linkul (copy / WhatsApp).
+
+     ╔══════════════════════════════════════════════════════════════════╗
+     ║  PENTRU DEZVOLTATORII PLATFORMEI — citiți blocul [DEV] mare de    ║
+     ║  la finalul fișierului (înainte de </script>). Acolo e explicat:  ║
+     ║   1. cum se salvează datele în contul miresei (GHL custom field)  ║
+     ║   2. cum se generează linkul public al invitației                 ║
+     ║   3. cum primește mireasa confirmările (RSVP)                      ║
+     ║  Tot ce e funcțional acum merge FĂRĂ platformă (link prin URL).   ║
+     ╚══════════════════════════════════════════════════════════════════╝
+     ════════════════════════════════════════════════════════════════════ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  #wd-creator{
+    --gold:#b8974a;--gold-dark:#9a7a32;--gold-light:#f5edd8;
+    --ink:#2a2521;--ink2:#4d443c;--muted:#8f8478;
+    --paper:#fdfaf4;--paper2:#f6efe2;--card:#fff;
+    --line:#e6ddd2;--sage:#7f9f73;--rose:#c98d7c;
+    --radius:18px;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Jost',system-ui,sans-serif;
+
+    font-family:var(--sans);color:var(--ink);line-height:1.6;font-weight:300;
+    background:var(--paper);min-height:100vh;
+  }
+  #wd-creator *{box-sizing:border-box;margin:0;padding:0}
+
+  /* ═══ HEADER ═══ */
+  #wd-creator .hero{text-align:center;padding:38px 20px 26px;background:linear-gradient(160deg,var(--paper2),var(--paper));border-bottom:1px solid var(--line)}
+  #wd-creator .hero .kick{font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold-dark);font-weight:600;margin-bottom:10px}
+  #wd-creator .hero h1{font-family:var(--serif);font-size:clamp(30px,6vw,44px);font-weight:600;color:var(--ink);line-height:1.1}
+  #wd-creator .hero p{font-size:14px;color:var(--muted);max-width:46ch;margin:10px auto 0}
+
+  /* ═══ LAYOUT ═══ */
+  #wd-creator .layout{max-width:1180px;margin:0 auto;padding:26px 18px 60px;display:grid;grid-template-columns:minmax(0,420px) 1fr;gap:28px;align-items:start}
+  @media(max-width:900px){#wd-creator .layout{grid-template-columns:1fr;gap:22px}}
+
+  /* ═══ FORMULAR (stânga) ═══ */
+  #wd-creator .form-col{position:sticky;top:18px}
+  @media(max-width:900px){#wd-creator .form-col{position:static}}
+  #wd-creator .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 6px 28px rgba(42,37,33,.05)}
+  #wd-creator .panel + .panel{margin-top:18px}
+  #wd-creator .panel h2{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:9px}
+  #wd-creator .panel h2 .ic{width:30px;height:30px;border-radius:50%;background:var(--gold-light);display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+  #wd-creator .panel .hint{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+
+  #wd-creator .field{margin-bottom:14px}
+  #wd-creator .field:last-child{margin-bottom:0}
+  #wd-creator label{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+  #wd-creator .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  #wd-creator input[type=text],#wd-creator input[type=date],#wd-creator input[type=time],#wd-creator input[type=tel],#wd-creator textarea{
+    width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:11px;font-family:var(--sans);font-size:14px;background:var(--paper);color:var(--ink);font-weight:300;transition:border-color .2s}
+  #wd-creator input:focus,#wd-creator textarea:focus{outline:none;border-color:var(--gold)}
+  #wd-creator textarea{resize:vertical;min-height:74px;line-height:1.5}
+  #wd-creator .sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+  /* upload poza */
+  #wd-creator .photo-up{display:flex;align-items:center;gap:13px}
+  #wd-creator .photo-thumb{width:62px;height:62px;border-radius:12px;object-fit:cover;background:var(--paper2);border:1px solid var(--line);flex-shrink:0}
+  #wd-creator .photo-thumb.empty{display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--muted)}
+  #wd-creator .up-btn{flex:1}
+  #wd-creator .up-btn label{display:inline-block;padding:9px 16px;border:1px dashed var(--gold);border-radius:10px;color:var(--gold-dark);font-size:12px;font-weight:600;cursor:pointer;text-transform:none;letter-spacing:0;transition:.2s}
+  #wd-creator .up-btn label:hover{background:var(--gold-light)}
+  #wd-creator .up-btn input{display:none}
+
+  /* ═══ PREVIEW (dreapta) ═══ */
+  #wd-creator .preview-col{min-width:0}
+  #wd-creator .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  #wd-creator .tab{flex:1;min-width:120px;padding:13px 12px;border:1px solid var(--line);border-radius:13px;background:var(--card);cursor:pointer;text-align:center;transition:.22s;position:relative}
+  #wd-creator .tab .t-name{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink)}
+  #wd-creator .tab .t-desc{font-size:10.5px;color:var(--muted);margin-top:2px}
+  #wd-creator .tab:hover{border-color:var(--gold)}
+  #wd-creator .tab.active{border-color:var(--gold);background:var(--gold-light);box-shadow:0 4px 16px rgba(184,151,74,.18)}
+  #wd-creator .tab.active::after{content:'✓';position:absolute;top:7px;right:9px;font-size:11px;color:var(--gold-dark);font-weight:700}
+
+  #wd-creator .stage{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 6px 28px rgba(42,37,33,.06)}
+  #wd-creator .stage-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--paper2)}
+  #wd-creator .stage-bar .dots{display:flex;gap:5px}
+  #wd-creator .stage-bar .dots span{width:9px;height:9px;border-radius:50%;background:var(--line)}
+  #wd-creator .stage-bar .dots span:nth-child(1){background:#e2a4a4}
+  #wd-creator .stage-bar .dots span:nth-child(2){background:#e6c97a}
+  #wd-creator .stage-bar .dots span:nth-child(3){background:#9bc18e}
+  #wd-creator .stage-bar .lbl{font-size:11px;color:var(--muted);letter-spacing:.05em}
+  #wd-creator iframe{width:100%;height:600px;border:none;display:block;background:#fff}
+
+  /* ═══ ACȚIUNI (sub preview) ═══ */
+  #wd-creator .actions{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  #wd-creator .actions h3{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);margin-bottom:4px}
+  #wd-creator .actions .ah{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  #wd-creator .link-box{display:flex;gap:8px;margin-bottom:14px}
+  #wd-creator .link3{margin-bottom:14px}
+  #wd-creator .link3-lbl{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  #wd-creator .link3-lbl span{font-weight:400;color:var(--text);font-size:12px}
+  #wd-creator .link-box input{flex:1;font-size:13px;color:var(--ink2);background:var(--paper2)}
+  #wd-creator .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:11px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.22s;text-decoration:none;letter-spacing:.02em}
+  #wd-creator .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;box-shadow:0 6px 18px rgba(184,151,74,.32)}
+  #wd-creator .btn-gold:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(184,151,74,.42)}
+  #wd-creator .btn-wa{background:#25d366;color:#fff}
+  #wd-creator .btn-wa:hover{transform:translateY(-1px);filter:brightness(1.05)}
+  #wd-creator .btn-ghost{background:var(--paper2);color:var(--ink2);border:1px solid var(--line)}
+  #wd-creator .btn-ghost:hover{border-color:var(--gold);color:var(--gold-dark)}
+  #wd-creator .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+  #wd-creator .btn-row .btn{flex:1;min-width:140px}
+  #wd-creator .copied{font-size:12px;color:var(--sage);font-weight:600;margin-top:10px;opacity:0;transition:.3s}
+  #wd-creator .copied.show{opacity:1}
+
+  #wd-creator .save-note{margin-top:16px;padding:13px 15px;background:var(--gold-light);border-radius:12px;font-size:12px;color:var(--ink2);line-height:1.5}
+  #wd-creator .save-note b{color:var(--gold-dark)}
+
+  /* BARA DE JOS — înapoi la panou / clipuri (identic cu trackerele) */
+  #wd-creator .bottom-bar{max-width:1180px;margin:8px auto 0;padding:22px 18px 0;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+  #wd-creator .btn-back{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink2);text-decoration:none;font-size:13px;font-weight:600;transition:.2s}
+  #wd-creator .btn-back:hover{border-color:var(--gold);color:var(--gold-dark)}
+</style>
+</head>
+<body>
+
+<div id="wd-creator">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="hero">
+    <div class="kick">Wedding Direction</div>
+    <h1>Creează-ți invitația de nuntă</h1>
+    <p>Completează datele o singură dată. Le vezi pe loc pe trei modele diferite, alegi preferatul și trimiți linkul invitaților.</p>
+  </div>
+
+  <div class="layout">
+
+    <!-- ═══════════ COLOANA STÂNGA: FORMULAR ═══════════ -->
+    <div class="form-col">
+
+      <div class="panel">
+        <h2><span class="ic">💑</span> Despre voi</h2>
+        <div class="hint">Numele care apar pe invitație.</div>
+        <div class="row2">
+          <div class="field"><label>Numele miresei</label><input type="text" id="f-mireasa" placeholder="Maria"></div>
+          <div class="field"><label>Numele mirelui</label><input type="text" id="f-mire" placeholder="Andrei"></div>
+        </div>
+        <div class="field">
+          <label>Data nunții</label>
+          <div class="row2">
+            <input type="date" id="f-data">
+            <input type="time" id="f-ora" value="17:00">
+          </div>
+          <div class="sub">Apare ca text frumos pe invitație + pornește numărătoarea inversă.</div>
+        </div>
+        <div class="field"><label>Orașul</label><input type="text" id="f-oras" placeholder="București"></div>
+      </div>
+
+      <div class="panel">
+        <h2><span class="ic">📷</span> Fotografiile voastre</h2>
+        <div class="hint">O poză mare de copertă și una pentru „Povestea noastră".</div>
+        <div class="field">
+          <label>Poza de copertă</label>
+          <div class="photo-up">
+            <img class="photo-thumb empty" id="thumb-cover" alt="">
+            <div class="up-btn"><label for="up-cover">Încarcă poza</label><input type="file" id="up-cover" accept="image/*"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Poza pentru „Povestea noastră"</label>
+          <div class="photo-up">
+            <img class="photo-thumb empty" id="thumb-story" alt="">
+            <div class="up-btn"><label for="up-story">Încarcă poza</label><input type="file" id="up-story" accept="image/*"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><span class="ic">💌</span> Povestea voastră</h2>
+        <div class="hint">Câteva rânduri despre voi — cum v-ați cunoscut, cererea, orice.</div>
+        <div class="field">
+          <textarea id="f-poveste" placeholder="Ne-am cunoscut într-o după-amiază de octombrie..."></textarea>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><span class="ic">⛪</span> Ceremonia religioasă</h2>
+        <div class="field"><label>Numele bisericii</label><input type="text" id="f-bis-nume" placeholder="Biserica Sfântul Nicolae"></div>
+        <div class="field"><label>Ora</label><input type="text" id="f-bis-ora" placeholder="Ora 18:00"></div>
+        <div class="field"><label>Adresa</label><input type="text" id="f-bis-adr" placeholder="Strada Bisericii nr. 12, București"></div>
+        <div class="field"><label>Caută pe hartă (pentru buton)</label><input type="text" id="f-bis-harta" placeholder="Biserica Sfantul Nicolae Bucuresti"><div class="sub">Numele locului așa cum apare în Google Maps.</div></div>
+      </div>
+
+      <div class="panel">
+        <h2><span class="ic">🥂</span> Petrecerea</h2>
+        <div class="field"><label>Numele localului</label><input type="text" id="f-loc-nume" placeholder="Grand Ballroom"></div>
+        <div class="field"><label>Ora</label><input type="text" id="f-loc-ora" placeholder="Ora 20:00"></div>
+        <div class="field"><label>Adresa</label><input type="text" id="f-loc-adr" placeholder="Bulevardul Primăverii nr. 45, București"></div>
+        <div class="field"><label>Caută pe hartă (pentru buton)</label><input type="text" id="f-loc-harta" placeholder="Grand Ballroom Bucuresti"></div>
+      </div>
+
+      <div class="panel">
+        <h2><span class="ic">✉️</span> Confirmare prezență</h2>
+        <div class="field"><label>Până când să confirme invitații</label><input type="text" id="f-deadline" placeholder="Confirmă până pe 1 Aprilie 2027"></div>
+        <div class="field"><label>WhatsApp-ul vostru (primiți confirmările)</label><input type="tel" id="f-whatsapp" placeholder="0757 588 885"><div class="sub">Aici primiți mesajele de confirmare de la invitați.</div></div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════ COLOANA DREAPTA: PREVIEW LIVE ═══════════ -->
+    <div class="preview-col">
+
+      <div class="tabs">
+        <div class="tab active" data-tpl="acuarela">
+          <div class="t-name">Acuarelă</div>
+          <div class="t-desc">Romantic, blush & sage</div>
+        </div>
+        <div class="tab" data-tpl="editorial">
+          <div class="t-name">Editorial</div>
+          <div class="t-desc">Modern, neutru & auriu</div>
+        </div>
+        <div class="tab" data-tpl="salvie">
+          <div class="t-name">Salvie</div>
+          <div class="t-desc">Elegant, verde & auriu</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-bar">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="lbl">Previzualizare live — exact ce vor vedea invitații</div>
+        </div>
+        <iframe id="preview" title="Previzualizare invitație"></iframe>
+      </div>
+
+      <!-- ACȚIUNI -->
+      <div class="actions">
+        <h3>Trimite invitația</h3>
+        <div class="ah">Ai 3 modele. Alege linkul modelului preferat și trimite-l invitaților:</div>
+
+        <div class="link3" data-m="acuarela">
+          <div class="link3-lbl">🌸 Acuarelă <span>— romantic, blush & sage</span></div>
+          <div class="link-box">
+            <input type="text" id="share-acuarela" readonly value="">
+            <button class="btn btn-ghost btn-copy3" data-copy="share-acuarela">Copiază</button>
+          </div>
+        </div>
+
+        <div class="link3" data-m="editorial">
+          <div class="link3-lbl">📋 Editorial <span>— modern, neutru & auriu</span></div>
+          <div class="link-box">
+            <input type="text" id="share-editorial" readonly value="">
+            <button class="btn btn-ghost btn-copy3" data-copy="share-editorial">Copiază</button>
+          </div>
+        </div>
+
+        <div class="link3" data-m="salvie">
+          <div class="link3-lbl">🌿 Salvie <span>— elegant, verde & auriu</span></div>
+          <div class="link-box">
+            <input type="text" id="share-salvie" readonly value="">
+            <button class="btn btn-ghost btn-copy3" data-copy="share-salvie">Copiază</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn btn-wa" id="btn-wa" target="_blank">Trimite pe WhatsApp modelul ales (<b id="chosen-name">Acuarelă</b>)</a>
+          <button class="btn btn-gold" id="btn-save">Salvează invitația</button>
+        </div>
+        <div class="copied" id="copied-msg">✓ Link copiat! Acum îl poți trimite oricui.</div>
+
+        <div class="save-note">
+          <b>Cum primești confirmările:</b> când un invitat apasă „Confirmă prezența" pe invitația ta, mesajul (nume + număr de persoane) ajunge direct pe WhatsApp-ul tău. Le poți bifa apoi în <b>Trackerul de invitați</b>.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BARA DE JOS — înapoi la panou / clipuri -->
+    <!-- [DEV] {{link_panou}} = panoul personal · {{link_clipuri}} = zona de curs/clipuri -->
+    <div class="bottom-bar" id="wd-navbar">
+      <a class="btn-back" data-nav="panou" href="#">⌂ Înapoi la panou</a>
+      <a class="btn-back" data-nav="buget" href="#">💰 Tracker buget</a>
+      <a class="btn-back" data-nav="invitati" href="#">👥 Tracker invitați</a>
+      <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator</a>
+      <a class="btn-back" href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net" target="_top">← Înapoi la video</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var root=document.getElementById('wd-creator');
+
+  // ═══ STAREA: datele completate de mireasă ═══
+  var D={
+    mireasa:'',mire:'',data:'',ora:'17:00',oras:'',
+    cover:'',story:'',poveste:'',
+    bisNume:'',bisOra:'',bisAdr:'',bisHarta:'',
+    locNume:'',locOra:'',locAdr:'',locHarta:'',
+    deadline:'',whatsapp:''
+  };
+  var current='acuarela';
+
+  // ════ CONEXIUNE val.town ════
+  var WD_API="https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
+  function wdGetCid(){
+    try{ var p=new URLSearchParams(location.search); if(p.get("cid")) return p.get("cid"); }catch(e){}
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k=localStorage.key(i);
+        if(k&&k.indexOf("firebase:authUser")>-1){
+          var d=JSON.parse(localStorage.getItem(k));
+          if(d&&d.stsTokenManager&&d.stsTokenManager.accessToken){
+            var pl=JSON.parse(atob(d.stsTokenManager.accessToken.split(".")[1].replace(/-/g,'+').replace(/_/g,'/')));
+            if(pl.contact_id) return pl.contact_id;
+          }
+        }
+      }
+    }catch(e){}
+    return null;
+  }
+  var WD_CID=wdGetCid();
+
+  // ── leg butoanele de navigare ──
+  (function(){
+    var LB="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
+    var Q=WD_CID?("?cid="+encodeURIComponent(WD_CID)):"";
+    var IDS={panou:"91ca406c-00bf-4a4c-ab24-f47971007e1c",buget:"48ea5cab-c32f-4ccb-a6c3-ba959f723785",invitati:"46f55aa5-48b0-4022-8161-5be7d1c9be34",comparator:"c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f"};
+    document.querySelectorAll('#wd-navbar [data-nav]').forEach(function(a){
+      var key=a.getAttribute('data-nav');
+      if(key==="curs"){ a.href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses"; }
+      else { var id=IDS[key]; if(id) a.href=LB+id+Q; }
+    });
+  })();
+  function wdUploadPhoto(file,onDone,onErr){
+    var fd=new FormData(); fd.append("file",file,file.name||"poza.jpg");
+    fetch(WD_API+"?action=upload",{method:"POST",body:fd})
+      .then(function(r){return r.json();})
+      .then(function(j){ if(j&&j.ok&&j.url) onDone(j.url); else onErr&&onErr(); })
+      .catch(function(){ onErr&&onErr(); });
+  }
+  function wdLoadInvitatie(cb){
+    if(!WD_CID){ cb&&cb(); return; }
+    fetch(WD_API+"?cid="+encodeURIComponent(WD_CID))
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(j&&j.ok){
+          if(j.invitatieJson&&typeof j.invitatieJson==="string"&&j.invitatieJson.charAt(0)==="{"){
+            try{ var saved=JSON.parse(j.invitatieJson); if(saved&&saved.date){ D=Object.assign(D,saved.date); if(saved.sablon_ales) current=saved.sablon_ales; } }catch(e){}
+          }
+          if(!D.data && j.dataNuntii) D.data=j.dataNuntii;
+        }
+        cb&&cb();
+      })
+      .catch(function(){ cb&&cb(); });
+  }
+
+  // ═══ HELPERS ═══
+  function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function dataText(){
+    if(!D.data) return 'Data nunții';
+    var luni=['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+    var p=D.data.split('-'); // AAAA-LL-ZZ
+    if(p.length!==3) return D.data;
+    return parseInt(p[2],10)+' '+luni[parseInt(p[1],10)-1]+' '+p[0];
+  }
+  function dataIso(){ return D.data ? (D.data+'T'+(D.ora||'17:00')) : ''; }
+  function waNum(){ return (D.whatsapp||'').replace(/[^0-9]/g,'').replace(/^0/,'40'); }
+  function mapUrl(q){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q||''); }
+  function ph(v,fallback){ return v ? esc(v) : fallback; }
+
+  // imagine fallback (placeholder elegant) daca nu e incarcata poza
+  var PH_COVER='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="900"><rect width="800" height="900" fill="#e9e0d2"/><text x="400" y="450" font-family="Georgia" font-size="34" fill="#b8a98c" text-anchor="middle">Poza voastră</text></svg>');
+  var PH_STORY='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="500" height="600"><rect width="500" height="600" fill="#ece3d5"/><text x="250" y="300" font-family="Georgia" font-size="24" fill="#b8a98c" text-anchor="middle">Poza poveste</text></svg>');
+
+  // ════════════════════════════════════════════════════════════
+  // RANDAREA CELOR 3 ȘABLOANE (versiuni complete, cu datele injectate)
+  // Fiecare întoarce un document HTML complet pentru iframe.
+  // ════════════════════════════════════════════════════════════
+  function commonHead(fonts){
+    return '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
+      '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
+      '<link href="https://fonts.googleapis.com/css2?family='+fonts+'&display=swap" rel="stylesheet">';
+  }
+
+  // —————————————————— ȘABLON ACUARELĂ ——————————————————
+  function tplAcuarela(){
+    var cover=D.cover||PH_COVER, story=D.story||PH_STORY;
+    return '<!DOCTYPE html><html lang="ro"><head>'+commonHead('Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500|Jost:wght@300;400;500')+
+    '<style>'+
+    ':root{--blush:#e8c4bd;--blush-soft:#f7e9e5;--blush-deep:#c98d7c;--sage:#a9bba0;--sage-soft:#eef3ea;--sage-deep:#7f9f73;--cream:#fdf8f4;--cream2:#f9efe9;--ink:#5a4a44;--ink-soft:#8a7873;--muted:#b3a39d;--line:rgba(201,141,124,.25);--serif:"Cormorant Garamond",Georgia,serif;--sans:"Jost",sans-serif}'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.7;font-weight:300}'+
+    '.inv{max-width:640px;margin:0 auto;background:var(--cream);position:relative}'+
+    '.inv::before{content:"";position:fixed;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(232,196,189,.35),transparent 65%);pointer-events:none}'+
+    '.inv::after{content:"";position:fixed;bottom:-80px;left:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(169,187,160,.3),transparent 65%);pointer-events:none}'+
+    '.cover{position:relative;min-height:96vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 32px;z-index:1}'+
+    '.cover-photo{width:230px;height:300px;border-radius:140px 140px 0 0;object-fit:cover;margin:0 auto 32px;border:5px solid #fff;box-shadow:0 16px 50px rgba(201,141,124,.28)}'+
+    '.cover .pre{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--blush-deep);margin-bottom:16px}'+
+    '.cover .names{font-family:var(--serif);font-size:clamp(42px,11vw,60px);font-weight:500;line-height:1.1;color:var(--ink)}'+
+    '.cover .amp{font-style:italic;color:var(--blush-deep)}'+
+    '.cover .date{margin-top:20px;font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--sage-deep)}'+
+    '.cover .leaf{font-size:26px;color:var(--sage);margin-bottom:8px}'+
+    '.tl-wrap{padding:30px 24px 40px;position:relative;z-index:1}'+
+    '.tl-intro{text-align:center;margin-bottom:10px}.tl-intro .leaf{font-size:24px;color:var(--sage)}'+
+    '.tl-intro p{font-family:var(--serif);font-size:22px;font-style:italic;color:var(--ink);max-width:28ch;margin:14px auto 0}'+
+    '.timeline{max-width:480px;margin:34px auto 0}'+
+    '.moment{padding:24px 0;display:flex;flex-direction:column;align-items:center;text-align:center}'+
+    '.moment .dot{width:48px;height:48px;border-radius:50%;background:var(--cream);border:2px solid var(--blush);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;box-shadow:0 4px 14px rgba(201,141,124,.2)}'+
+    '.moment.sage .dot{border-color:var(--sage)}'+
+    '.moment .m-label{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--blush-deep);font-weight:500;margin-bottom:6px}.moment.sage .m-label{color:var(--sage-deep)}'+
+    '.moment .m-title{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ink);margin-bottom:4px}'+
+    '.moment .m-time{font-size:13px;color:var(--blush-deep);font-weight:500;margin-bottom:8px}'+
+    '.moment .m-text{font-size:14px;color:var(--ink-soft);max-width:34ch;margin:0 auto}'+
+    '.moment .m-photo{width:160px;height:160px;border-radius:50%;object-fit:cover;margin:14px auto 0;border:4px solid #fff;box-shadow:0 8px 26px rgba(201,141,124,.22)}'+
+    '.map-btn{display:inline-flex;gap:7px;margin-top:14px;padding:10px 22px;border:1px solid var(--blush-deep);border-radius:999px;color:var(--blush-deep);font-size:11px;font-weight:500;text-decoration:none;letter-spacing:.1em;text-transform:uppercase}'+
+    '.moment.sage .map-btn{border-color:var(--sage-deep);color:var(--sage-deep)}'+
+    '.cd-grid{display:flex;justify-content:center;gap:20px;margin-top:6px}'+
+    '.cd-num{font-family:var(--serif);font-size:40px;font-weight:600;color:var(--blush-deep)}'+
+    '.cd-lab{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:4px}'+
+    '.rsvp{text-align:center;padding:46px 30px;background:var(--cream2);position:relative;z-index:1;border:1px solid var(--line);border-radius:28px;margin:20px 18px 36px}'+
+    '.rsvp .leaf{font-size:24px;color:var(--sage);margin-bottom:10px}'+
+    '.rsvp h2{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--ink);margin-bottom:8px}'+
+    '.rsvp p{font-size:14px;color:var(--ink-soft);max-width:32ch;margin:0 auto 14px}'+
+    '.rsvp-deadline{font-size:12px;color:var(--blush-deep);font-weight:500;margin-bottom:20px}'+
+    '.btns{display:flex;flex-direction:column;gap:11px;align-items:center}'+
+    '.btn-soft{padding:14px 38px;border:none;border-radius:999px;background:linear-gradient(135deg,var(--blush-deep),var(--blush));color:#fff;font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:.08em;box-shadow:0 8px 24px rgba(201,141,124,.35)}'+
+    '.btn-ghost{background:transparent;border:1px solid var(--sage-deep);color:var(--sage-deep);box-shadow:none;font-size:12px;padding:11px 28px;border-radius:999px}'+
+    '.footer{text-align:center;padding:36px 32px;position:relative;z-index:1}.footer .f-leaf{font-size:22px;color:var(--sage);margin-bottom:10px}'+
+    '.footer .f-names{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--ink)}'+
+    '.footer .f-date{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}'+
+    '</style></head><body><div class="inv">'+
+    '<div class="cover"><img class="cover-photo" src="'+cover+'"><div class="leaf">❧</div><div class="pre">Vă invităm la nunta noastră</div>'+
+    '<div class="names">'+ph(D.mireasa,'Maria')+' <span class="amp">&amp;</span> '+ph(D.mire,'Andrei')+'</div><div class="date">'+dataText()+'</div></div>'+
+    '<div class="tl-wrap"><div class="tl-intro"><div class="leaf">❧</div><p>Fiecare poveste are un început. A noastră ne-a adus până aici.</p></div>'+
+    '<div class="timeline">'+
+    '<div class="moment"><div class="dot">💛</div><div class="m-label">Povestea noastră</div><div class="m-text">'+ph(D.poveste,'Câteva rânduri despre povestea voastră vor apărea aici.')+'</div><img class="m-photo" src="'+story+'"></div>'+
+    '<div class="moment sage"><div class="dot">⛪</div><div class="m-label">Ceremonia religioasă</div><div class="m-title">'+ph(D.bisNume,'Biserica')+'</div><div class="m-time">'+ph(D.bisOra,'Ora 18:00')+'</div><div class="m-text">'+ph(D.bisAdr,'Adresa bisericii')+'</div><a class="map-btn" href="'+mapUrl(D.bisHarta)+'" target="_blank">📍 Vezi pe hartă</a></div>'+
+    '<div class="moment"><div class="dot">🥂</div><div class="m-label">Petrecerea</div><div class="m-title">'+ph(D.locNume,'Localul')+'</div><div class="m-time">'+ph(D.locOra,'Ora 20:00')+'</div><div class="m-text">'+ph(D.locAdr,'Adresa localului')+'</div><a class="map-btn" href="'+mapUrl(D.locHarta)+'" target="_blank">📍 Vezi pe hartă</a></div>'+
+    '<div class="moment"><div class="dot">⏳</div><div class="m-label">Până la marea zi</div><div class="cd-grid"><div><div class="cd-num" data-cd="d">—</div><div class="cd-lab">zile</div></div><div><div class="cd-num" data-cd="h">—</div><div class="cd-lab">ore</div></div><div><div class="cd-num" data-cd="m">—</div><div class="cd-lab">minute</div></div></div></div>'+
+    '</div></div>'+
+    '<section class="rsvp"><div class="leaf">❧</div><h2>Confirmă prezența</h2><p>Ne-ar bucura nespus să te avem alături.</p><div class="rsvp-deadline">'+ph(D.deadline,'')+'</div>'+
+    '<div class="btns"><button class="btn-soft">Voi fi prezent(ă)</button><button class="btn-soft btn-ghost">Din păcate, nu pot ajunge</button></div></section>'+
+    '<div class="footer"><div class="f-leaf">❧</div><div class="f-names">'+ph(D.mireasa,'Maria')+' &amp; '+ph(D.mire,'Andrei')+'</div><div class="f-date">'+dataText()+'</div></div>'+
+    '</div>'+cdScript()+'</body></html>';
+  }
+
+  // —————————————————— ȘABLON EDITORIAL NEUTRU ——————————————————
+  function tplEditorial(){
+    var cover=D.cover||PH_COVER, story=D.story||PH_STORY;
+    return '<!DOCTYPE html><html lang="ro"><head>'+commonHead('Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400|Jost:wght@300;400;500')+
+    '<style>'+
+    ':root{--ivory:#f5f1ea;--ivory2:#ece5da;--paper:#fbf8f2;--ink:#262019;--ink2:#473e34;--muted:#8a7d6c;--gold:#a8895a;--gold-light:#c9b083;--line:#d8cdbd;--serif:"Cormorant Garamond",Georgia,serif;--sans:"Jost",sans-serif}'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--sans);color:var(--ink);background:var(--ivory);line-height:1.7;font-weight:300}'+
+    '.inv{max-width:720px;margin:0 auto;background:var(--paper)}'+
+    '.sprig{display:block;margin:0 auto;color:var(--gold);width:54px}'+
+    '.rule{display:flex;align-items:center;gap:14px;justify-content:center;margin:0 auto;max-width:240px}.rule::before,.rule::after{content:"";height:1px;background:var(--gold);flex:1;opacity:.5}.rule .dot{width:5px;height:5px;border:1px solid var(--gold);transform:rotate(45deg)}'+
+    '.cover{position:relative;min-height:96vh;display:flex;flex-direction:column;justify-content:flex-start;padding:18px 18px 0;background:var(--paper)}'+
+    '.cover-photo{width:100%;height:62vh;object-fit:cover;object-position:center;background:var(--ivory2);border-radius:18px;box-shadow:0 12px 40px rgba(38,32,25,.12)}'+
+    '.cover-band{position:relative;padding:26px 18px 30px;text-align:left;flex:1;display:flex;flex-direction:column;justify-content:center}'+
+    '.cover-band::before{content:"";position:absolute;top:14px;left:18px;right:18px;height:1px;background:var(--gold);opacity:.4}'+
+    '.cover .est{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:14px}'+
+    '.cover .names{font-family:var(--serif);font-size:clamp(46px,13vw,78px);font-weight:400;line-height:.95;color:var(--ink)}'+
+    '.cover .names .amp{font-style:italic;color:var(--gold)}'+
+    '.cover .meta{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;flex-wrap:wrap;gap:10px}'+
+    '.cover .meta .date{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}.cover .meta .city{font-family:var(--serif);font-size:18px;font-style:italic;color:var(--muted)}'+
+    'section{padding:58px 36px;position:relative}.ed{position:relative}'+
+    '.ed-num{font-family:var(--serif);font-size:120px;font-weight:300;line-height:.8;color:var(--ivory2);position:absolute;top:-18px;right:0;user-select:none}'+
+    '.ed-kicker{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:10px;position:relative}'+
+    '.ed-body{position:relative}'+
+    '.intro-q{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--ink2);line-height:1.5;max-width:32ch}'+
+    '.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;margin-top:8px}'+
+    '.story-grid img{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--ivory2)}'+
+    '.story-grid .st-text{font-family:var(--serif);font-size:19px;font-style:italic;color:var(--ink2);line-height:1.65}'+
+    '.ev-name{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--ink);margin-bottom:4px}'+
+    '.ev-time{font-size:13px;letter-spacing:.1em;color:var(--gold);font-weight:500;margin-bottom:10px;text-transform:uppercase}'+
+    '.ev-addr{font-size:14px;color:var(--muted);max-width:38ch;margin-bottom:16px}'+
+    '.map-btn{display:inline-flex;gap:8px;padding:11px 26px;border:1px solid var(--ink);color:var(--ink);font-size:10.5px;font-weight:500;text-decoration:none;letter-spacing:.15em;text-transform:uppercase}'+
+    '.cd-row{display:flex;border:1px solid var(--line);margin-top:6px}.cd-cell{flex:1;text-align:center;padding:22px 8px}.cd-cell+.cd-cell{border-left:1px solid var(--line)}'+
+    '.cd-num{font-family:var(--serif);font-size:44px;font-weight:400;color:var(--ink)}.cd-lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}'+
+    '.rsvp{background:var(--ink);color:var(--ivory);text-align:center;padding:52px 36px;border-radius:28px;margin:20px 18px 0}'+
+    '.rsvp .sprig{color:var(--gold-light);margin-bottom:18px}.rsvp h2{font-family:var(--serif);font-size:36px;font-weight:400;margin-bottom:10px}'+
+    '.rsvp p{font-size:14px;color:#cdc2b3;max-width:32ch;margin:0 auto 14px}'+
+    '.rsvp-deadline{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold-light);font-weight:500;margin-bottom:22px}'+
+    '.btns{display:flex;flex-direction:column;gap:12px;align-items:center}'+
+    '.btn-ed{padding:15px 42px;border:1px solid var(--gold-light);background:transparent;color:var(--gold-light);font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase}'+
+    '.btn-ghost{border-color:rgba(216,205,189,.4);color:#cdc2b3;font-size:10px;padding:12px 30px}'+
+    '.footer{text-align:center;padding:44px 36px;background:var(--paper)}.footer .f-names{font-family:var(--serif);font-size:30px;font-weight:400;color:var(--ink)}.footer .f-names .amp{font-style:italic;color:var(--gold)}.footer .f-date{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:8px}'+
+    '@media(max-width:560px){.story-grid{grid-template-columns:1fr}section{padding:46px 22px}}'+
+    '</style></head><body><div class="inv">'+
+    '<div class="cover"><img class="cover-photo" src="'+cover+'"><div class="cover-band"><div class="est">Ne căsătorim</div>'+
+    '<div class="names">'+ph(D.mireasa,'Maria')+' <span class="amp">&amp;</span><br>'+ph(D.mire,'Andrei')+'</div>'+
+    '<div class="meta"><div class="date">'+dataText()+'</div><div class="city">'+ph(D.oras,'Orașul')+'</div></div></div></div>'+
+    '<section class="ed"><div class="ed-num">01</div><div class="ed-kicker">Invitație</div><div class="ed-body">'+
+    '<p class="intro-q">„Cu bucurie în suflet, vă invităm să ne fiți alături în ziua în care spunem Da."</p>'+
+    '<div class="rule" style="margin:30px 0"><span class="dot"></span></div>'+
+    '<div class="story-grid"><img src="'+story+'"><div class="st-text">'+ph(D.poveste,'Povestea voastră va apărea aici.')+'</div></div></div></section>'+
+    '<section class="ed"><div class="ed-num">02</div><div class="ed-kicker">Ceremonia religioasă</div><div class="ed-body">'+sprigSvg()+
+    '<div class="ev-name">'+ph(D.bisNume,'Biserica')+'</div><div class="ev-time">'+ph(D.bisOra,'Ora 18:00')+'</div><div class="ev-addr">'+ph(D.bisAdr,'Adresa bisericii')+'</div>'+
+    '<a class="map-btn" href="'+mapUrl(D.bisHarta)+'" target="_blank">Vezi pe hartă</a></div></section>'+
+    '<section class="ed" style="background:var(--ivory2)"><div class="ed-num" style="color:#e2d9cb">03</div><div class="ed-kicker">Petrecerea</div><div class="ed-body">'+sprigSvg()+
+    '<div class="ev-name">'+ph(D.locNume,'Localul')+'</div><div class="ev-time">'+ph(D.locOra,'Ora 20:00')+'</div><div class="ev-addr">'+ph(D.locAdr,'Adresa localului')+'</div>'+
+    '<a class="map-btn" href="'+mapUrl(D.locHarta)+'" target="_blank">Vezi pe hartă</a></div></section>'+
+    '<section class="ed" style="background:var(--ivory2)"><div class="ed-num" style="color:#e2d9cb">04</div><div class="ed-kicker">Până la marea zi</div><div class="ed-body">'+
+    '<div class="cd-row"><div class="cd-cell"><div class="cd-num" data-cd="d">—</div><div class="cd-lab">zile</div></div><div class="cd-cell"><div class="cd-num" data-cd="h">—</div><div class="cd-lab">ore</div></div><div class="cd-cell"><div class="cd-num" data-cd="m">—</div><div class="cd-lab">minute</div></div></div></div></section>'+
+    '<section class="rsvp">'+sprigSvg()+'<h2>Confirmă prezența</h2><p>Ne-ar face mare bucurie să te avem alături.</p><div class="rsvp-deadline">'+ph(D.deadline,'')+'</div>'+
+    '<div class="btns"><button class="btn-ed">Voi fi prezent(ă)</button><button class="btn-ed btn-ghost">Din păcate, nu pot ajunge</button></div></section>'+
+    '<div class="footer"><div class="rule" style="margin-bottom:18px"><span class="dot"></span></div><div class="f-names">'+ph(D.mireasa,'Maria')+' <span class="amp">&amp;</span> '+ph(D.mire,'Andrei')+'</div><div class="f-date">'+dataText()+'</div></div>'+
+    '</div>'+cdScript()+'</body></html>';
+  }
+
+  // —————————————————— ȘABLON SALVIE ——————————————————
+  function tplSalvie(){
+    var cover=D.cover||PH_COVER, story=D.story||PH_STORY;
+    return '<!DOCTYPE html><html lang="ro"><head>'+commonHead('Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400|Jost:wght@300;400;500')+
+    '<style>'+
+    ':root{--emerald:#fbfaf5;--emerald2:#eef2e8;--paper:#fbfaf5;--cream-dim:#6b7563;--ink:#3d4a3a;--ink2:#5a6453;--muted:#9aa491;--gold:#b89a52;--sage:#7f9f73;--sage-deep:#5e7d53;--line:rgba(127,159,115,.3);--serif:"Cormorant Garamond",Georgia,serif;--sans:"Jost",sans-serif}'+
+    '*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--sans);color:var(--ink);background:var(--emerald);line-height:1.7;font-weight:300}'+
+    '.inv{max-width:720px;margin:0 auto;background:var(--emerald)}'+
+    '.sprig{display:block;margin:0 auto;color:var(--gold);width:54px}'+
+    '.rule{display:flex;align-items:center;gap:14px;justify-content:center;margin:0 auto;max-width:240px}.rule::before,.rule::after{content:"";height:1px;background:var(--gold);flex:1;opacity:.5}.rule .dot{width:5px;height:5px;border:1px solid var(--gold);transform:rotate(45deg)}'+
+    '.cover{position:relative;min-height:96vh;display:flex;flex-direction:column;justify-content:flex-start;padding:18px 18px 0}'+
+    '.cover-photo{width:100%;height:60vh;object-fit:cover;background:var(--emerald2);border-radius:18px;box-shadow:0 12px 40px rgba(94,125,83,.18)}'+
+    '.cover-band{position:relative;padding:26px 18px 30px;text-align:left;background:var(--emerald);flex:1;display:flex;flex-direction:column;justify-content:center}'+
+    '.cover-band::before{content:"";position:absolute;top:14px;left:18px;right:18px;height:1px;background:var(--gold);opacity:.5}'+
+    '.cover .est{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--sage-deep);font-weight:500;margin-bottom:14px}'+
+    '.cover .names{font-family:var(--serif);font-size:clamp(46px,13vw,78px);font-weight:400;line-height:.95;color:var(--ink)}.cover .names .amp{font-style:italic;color:var(--gold)}'+
+    '.cover .meta{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;flex-wrap:wrap;gap:10px}'+
+    '.cover .meta .date{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}.cover .meta .city{font-family:var(--serif);font-size:18px;font-style:italic;color:var(--sage-deep)}'+
+    'section{padding:58px 36px;position:relative}.ed{position:relative}'+
+    '.ed-num{font-family:var(--serif);font-size:120px;font-weight:300;line-height:.8;color:rgba(127,159,115,.13);position:absolute;top:-18px;right:0;user-select:none}'+
+    '.ed-kicker{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--sage-deep);font-weight:500;margin-bottom:10px;position:relative}'+
+    '.ed-body{position:relative}'+
+    '.intro-q{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--ink2);line-height:1.5;max-width:32ch}'+
+    '.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;margin-top:8px}'+
+    '.story-grid img{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--emerald2)}'+
+    '.story-grid .st-text{font-family:var(--serif);font-size:19px;font-style:italic;color:var(--ink2);line-height:1.65}'+
+    '.ev-name{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--ink);margin-bottom:4px}'+
+    '.ev-time{font-size:13px;letter-spacing:.1em;color:var(--sage-deep);font-weight:500;margin-bottom:10px;text-transform:uppercase}'+
+    '.ev-addr{font-size:14px;color:var(--cream-dim);max-width:38ch;margin-bottom:16px}'+
+    '.map-btn{display:inline-flex;gap:8px;padding:11px 26px;border:1px solid var(--sage-deep);color:var(--sage-deep);font-size:10.5px;font-weight:500;text-decoration:none;letter-spacing:.15em;text-transform:uppercase}'+
+    '.cd-row{display:flex;border:1px solid var(--line);margin-top:6px}.cd-cell{flex:1;text-align:center;padding:22px 8px}.cd-cell+.cd-cell{border-left:1px solid var(--line)}'+
+    '.cd-num{font-family:var(--serif);font-size:44px;font-weight:400;color:var(--sage-deep)}.cd-lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}'+
+    '.rsvp{background:var(--sage);color:#fff;text-align:center;padding:52px 36px;border-radius:28px;margin:20px 18px 0}'+
+    '.rsvp .sprig{color:#fff;margin-bottom:18px}.rsvp h2{font-family:var(--serif);font-size:36px;font-weight:500;margin-bottom:10px;color:#fff}'+
+    '.rsvp p{font-size:14px;color:rgba(255,255,255,.9);max-width:32ch;margin:0 auto 14px}'+
+    '.rsvp-deadline{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#fff;font-weight:600;margin-bottom:22px}'+
+    '.btns{display:flex;flex-direction:column;gap:12px;align-items:center}'+
+    '.btn-ed{padding:15px 42px;border:1px solid #fff;background:#fff;color:var(--sage-deep);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase}'+
+    '.btn-ghost{background:transparent;border-color:rgba(255,255,255,.55);color:#fff;font-size:10px;padding:12px 30px}'+
+    '.footer{text-align:center;padding:44px 36px;background:var(--paper)}.footer .f-names{font-family:var(--serif);font-size:30px;font-weight:400;color:var(--ink)}.footer .f-names .amp{font-style:italic;color:var(--gold)}.footer .f-date{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:8px}'+
+    '@media(max-width:560px){.story-grid{grid-template-columns:1fr}section{padding:46px 22px}}'+
+    '</style></head><body><div class="inv">'+
+    '<div class="cover"><img class="cover-photo" src="'+cover+'"><div class="cover-band"><div class="est">Ne căsătorim</div>'+
+    '<div class="names">'+ph(D.mireasa,'Maria')+' <span class="amp">&amp;</span><br>'+ph(D.mire,'Andrei')+'</div>'+
+    '<div class="meta"><div class="date">'+dataText()+'</div><div class="city">'+ph(D.oras,'Orașul')+'</div></div></div></div>'+
+    '<section class="ed"><div class="ed-num">01</div><div class="ed-kicker">Invitație</div><div class="ed-body">'+
+    '<p class="intro-q">„Cu bucurie în suflet, vă invităm să ne fiți alături în ziua în care spunem Da."</p>'+
+    '<div class="rule" style="margin:30px 0"><span class="dot"></span></div>'+
+    '<div class="story-grid"><img src="'+story+'"><div class="st-text">'+ph(D.poveste,'Povestea voastră va apărea aici.')+'</div></div></div></section>'+
+    '<section class="ed"><div class="ed-num">02</div><div class="ed-kicker">Ceremonia religioasă</div><div class="ed-body">'+sprigSvg()+
+    '<div class="ev-name">'+ph(D.bisNume,'Biserica')+'</div><div class="ev-time">'+ph(D.bisOra,'Ora 18:00')+'</div><div class="ev-addr">'+ph(D.bisAdr,'Adresa bisericii')+'</div>'+
+    '<a class="map-btn" href="'+mapUrl(D.bisHarta)+'" target="_blank">Vezi pe hartă</a></div></section>'+
+    '<section class="ed" style="background:var(--emerald2)"><div class="ed-num" style="color:rgba(127,159,115,.16)">03</div><div class="ed-kicker">Petrecerea</div><div class="ed-body">'+sprigSvg()+
+    '<div class="ev-name">'+ph(D.locNume,'Localul')+'</div><div class="ev-time">'+ph(D.locOra,'Ora 20:00')+'</div><div class="ev-addr">'+ph(D.locAdr,'Adresa localului')+'</div>'+
+    '<a class="map-btn" href="'+mapUrl(D.locHarta)+'" target="_blank">Vezi pe hartă</a></div></section>'+
+    '<section class="ed" style="background:var(--emerald2)"><div class="ed-num" style="color:rgba(127,159,115,.16)">04</div><div class="ed-kicker">Până la marea zi</div><div class="ed-body">'+
+    '<div class="cd-row"><div class="cd-cell"><div class="cd-num" data-cd="d">—</div><div class="cd-lab">zile</div></div><div class="cd-cell"><div class="cd-num" data-cd="h">—</div><div class="cd-lab">ore</div></div><div class="cd-cell"><div class="cd-num" data-cd="m">—</div><div class="cd-lab">minute</div></div></div></div></section>'+
+    '<section class="rsvp">'+sprigSvg()+'<h2>Confirmă prezența</h2><p>Ne-ar face mare bucurie să te avem alături.</p><div class="rsvp-deadline">'+ph(D.deadline,'')+'</div>'+
+    '<div class="btns"><button class="btn-ed">Voi fi prezent(ă)</button><button class="btn-ed btn-ghost">Din păcate, nu pot ajunge</button></div></section>'+
+    '<div class="footer"><div class="rule" style="margin-bottom:18px"><span class="dot"></span></div><div class="f-names">'+ph(D.mireasa,'Maria')+' <span class="amp">&amp;</span> '+ph(D.mire,'Andrei')+'</div><div class="f-date">'+dataText()+'</div></div>'+
+    '</div>'+cdScript()+'</body></html>';
+  }
+
+  function sprigSvg(){
+    return '<svg class="sprig" viewBox="0 0 60 30" fill="none" style="margin-bottom:16px"><path d="M30 28V6" stroke="currentColor" stroke-width="1"/><path d="M30 14c-4-2-8-1-11-4M30 14c4-2 8-1 11-4M30 20c-3-1.5-6-1-8.5-3M30 20c3-1.5 6-1 8.5-3M30 8c-2-1-4-3-4-6M30 8c2-1 4-3 4-6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><circle cx="30" cy="4" r="2" fill="currentColor"/></svg>';
+  }
+  function cdScript(){
+    var iso=dataIso();
+    return '<script>(function(){var wd="'+iso+'";function t(){if(!/^\\d{4}-\\d{2}-\\d{2}/.test(wd))return;var df=new Date(wd)-new Date();if(df<0)df=0;var d=Math.floor(df/864e5),h=Math.floor(df%864e5/36e5),m=Math.floor(df%36e5/6e4);document.querySelectorAll("[data-cd=d]").forEach(function(e){e.textContent=d});document.querySelectorAll("[data-cd=h]").forEach(function(e){e.textContent=h});document.querySelectorAll("[data-cd=m]").forEach(function(e){e.textContent=m})}t();setInterval(t,6e4);})();<\/scr'+'ipt>';
+  }
+
+  var TEMPLATES={acuarela:tplAcuarela,editorial:tplEditorial,salvie:tplSalvie};
+  var TPL_NAMES={acuarela:'Acuarelă',editorial:'Editorial',salvie:'Salvie'};
+
+  // ═══ RANDARE în iframe ═══
+  function renderPreview(){
+    var iframe=document.getElementById('preview');
+    var html=TEMPLATES[current]();
+    iframe.srcdoc=html;
+  }
+
+  // ═══ LINK PARTAJABIL ═══
+  // Funcțional ACUM: codează toate datele în URL (#...). Invitația se
+  // deschide pe pagina-vizualizator (vezi [DEV]). Fără platformă.
+  function buildShareLink(model){
+    var m = model || current;
+    // includ TOATE datele + pozele (URL-uri scurte de pe GHL, incap in link)
+    var payload={ sablon_ales: m, date: {
+      mireasa:D.mireasa, mire:D.mire, data:D.data, ora:D.ora, oras:D.oras, poveste:D.poveste,
+      cover:D.cover, story:D.story,
+      bisNume:D.bisNume, bisOra:D.bisOra, bisAdr:D.bisAdr, bisHarta:D.bisHarta,
+      locNume:D.locNume, locOra:D.locOra, locAdr:D.locAdr, locHarta:D.locHarta,
+      deadline:D.deadline, whatsapp:D.whatsapp
+    }};
+    var encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+    var base='https://butcuu.github.io/wd/invitatie.html';
+    return base+'#'+encoded;
+  }
+  function refreshLink(){
+    // umplu cele 3 linkuri, fiecare cu modelul lui
+    var a=document.getElementById('share-acuarela'); if(a) a.value=buildShareLink('acuarela');
+    var e=document.getElementById('share-editorial'); if(e) e.value=buildShareLink('editorial');
+    var s=document.getElementById('share-salvie'); if(s) s.value=buildShareLink('salvie');
+    // numele modelului ales (pt WhatsApp)
+    var cn=document.getElementById('chosen-name'); if(cn) cn.textContent=TPL_NAMES[current];
+    // WhatsApp trimite modelul ales (tab activ)
+    var waMsg=encodeURIComponent('Vă invităm la nunta noastră! 💛 Detaliile și confirmarea aici:\n'+buildShareLink(current));
+    var wa=document.getElementById('btn-wa'); if(wa) wa.href='https://wa.me/?text='+waMsg;
+  }
+
+  // ═══ CITIRE FORMULAR ═══
+  function bindInput(id,key,after){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input',function(){ D[key]=el.value; if(after)after(); scheduleRender(); });
+  }
+  bindInput('f-mireasa','mireasa'); bindInput('f-mire','mire');
+  bindInput('f-data','data'); bindInput('f-ora','ora'); bindInput('f-oras','oras');
+  bindInput('f-poveste','poveste');
+  bindInput('f-bis-nume','bisNume'); bindInput('f-bis-ora','bisOra'); bindInput('f-bis-adr','bisAdr'); bindInput('f-bis-harta','bisHarta');
+  bindInput('f-loc-nume','locNume'); bindInput('f-loc-ora','locOra'); bindInput('f-loc-adr','locAdr'); bindInput('f-loc-harta','locHarta');
+  bindInput('f-deadline','deadline'); bindInput('f-whatsapp','whatsapp',refreshLink);
+
+  // pornesc ora implicită
+  D.ora=document.getElementById('f-ora').value||'17:00';
+
+  // ═══ UPLOAD POZE (preview local prin DataURL) ═══
+  function bindPhoto(inputId,thumbId,key){
+    var inp=document.getElementById(inputId), thumb=document.getElementById(thumbId);
+    inp.addEventListener('change',function(){
+      var file=inp.files&&inp.files[0]; if(!file)return;
+      var reader=new FileReader();
+      reader.onload=function(e){ thumb.src=e.target.result; thumb.classList.remove('empty'); };
+      reader.readAsDataURL(file);
+      wdUploadPhoto(file, function(url){
+        D[key]=url; thumb.src=url; thumb.classList.remove('empty'); scheduleRender();
+      }, function(){ alert('Poza nu s-a putut urca. Mai încearcă cu o poză mai mică.'); });
+    });
+  }
+  bindPhoto('up-cover','thumb-cover','cover');
+  bindPhoto('up-story','thumb-story','story');
+
+  // ═══ TAB-URI (alegerea șablonului) ═══
+  root.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      root.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      current=tab.getAttribute('data-tpl');
+      renderPreview(); refreshLink();
+    });
+  });
+
+  // ═══ COPY LINK (cele 3 butoane) ═══
+  root.querySelectorAll('.btn-copy3').forEach(function(b){
+    b.addEventListener('click',function(){
+      var inp=document.getElementById(b.getAttribute('data-copy'));
+      if(!inp) return;
+      inp.select(); inp.setSelectionRange(0,99999);
+      try{ document.execCommand('copy'); }catch(e){}
+      if(navigator.clipboard){ navigator.clipboard.writeText(inp.value).catch(function(){}); }
+      var msg=document.getElementById('copied-msg'); msg.classList.add('show');
+      setTimeout(function(){msg.classList.remove('show');},2500);
+    });
+  });
+
+  // ═══ SALVARE ═══
+  document.getElementById('btn-save').addEventListener('click',function(){
+    wdSaveInvitatie();
+  });
+
+  // randare cu debounce (ca să nu re-randeze la fiecare tastă)
+  var rt;
+  function scheduleRender(){ clearTimeout(rt); rt=setTimeout(function(){ renderPreview(); refreshLink(); },220); }
+
+  // randare inițială — după ce încărcăm datele salvate
+  wdLoadInvitatie(function(){
+    try{
+      var map={'f-mireasa':'mireasa','f-mire':'mire','f-data':'data','f-ora':'ora','f-oras':'oras','f-poveste':'poveste','f-bis-nume':'bisNume','f-bis-ora':'bisOra','f-bis-adr':'bisAdr','f-bis-harta':'bisHarta','f-loc-nume':'locNume','f-loc-ora':'locOra','f-loc-adr':'locAdr','f-loc-harta':'locHarta','f-deadline':'deadline','f-whatsapp':'whatsapp'};
+      Object.keys(map).forEach(function(id){ var e=document.getElementById(id); if(e&&D[map[id]]!=null&&D[map[id]]!=="") e.value=D[map[id]]; });
+      if(D.cover){ var tc=document.getElementById('thumb-cover'); if(tc){tc.src=D.cover;tc.classList.remove('empty');} }
+      if(D.story){ var ts=document.getElementById('thumb-story'); if(ts){ts.src=D.story;ts.classList.remove('empty');} }
+      root.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-tpl')===current); });
+    }catch(e){}
+    renderPreview(); refreshLink();
+  });
+
+  // ════════════════════════════════════════════════════════════════
+  // ║                  PENTRU DEZVOLTATORII PLATFORMEI               ║
+  // ════════════════════════════════════════════════════════════════
+  //
+  // Acest panel are 3 funcții care depind de platformă (GHL). Mai jos,
+  // ce face fiecare și ce trebuie să conectați.
+  //
+  // ───────────────────────────────────────────────────────────────
+  // 1) SALVAREA DATELOR ÎN CONTUL MIRESEI
+  // ───────────────────────────────────────────────────────────────
+  // Obiectul D conține tot ce a completat mireasa (nume, dată, locații,
+  // text, + pozele ca DataURL base64). La click pe "Salvează invitația"
+  // se cheamă wdSaveInvitatie() de mai jos.
+  //
+  // RECOMANDAT: salvați D ca JSON într-un custom field GHL pe contactul
+  // miresei (ex. "invitatie_json"), via webhook. ATENȚIE la poze:
+  // DataURL-urile sunt mari — ideal le încărcați separat în storage
+  // (GHL media / S3) și păstrați doar URL-urile în JSON.
+  //
+  function wdSaveInvitatie(){
+    var payload={ sablon_ales: current, date: D };
+    if(!WD_CID){ alert('Nu te-am putut identifica — deschide pagina din contul tău (din panou).'); return; }
+    var btn=document.getElementById('btn-save'); var old=btn?btn.textContent:'';
+    if(btn){ btn.disabled=true; btn.textContent='Se salvează...'; }
+    fetch(WD_API+"?cid="+encodeURIComponent(WD_CID),{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ invitatieJson: JSON.stringify(payload) })
+    })
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(btn){ btn.disabled=false; btn.textContent=old; }
+      if(j&&(j.ok||j.salvat)){ try{ window.name='WD_INV:'+JSON.stringify(payload); }catch(e){}
+        alert('Invitația ta a fost salvată în contul tău! ✓'); }
+      else alert('Nu s-a putut salva. Mai încearcă.');
+    })
+    .catch(function(){ if(btn){ btn.disabled=false; btn.textContent=old; } alert('Eroare la salvare.'); });
+  }
+  //
+  // ───────────────────────────────────────────────────────────────
+  // 2) LINKUL PUBLIC AL INVITAȚIEI
+  // ───────────────────────────────────────────────────────────────
+  // CUM MERGE ACUM (fără platformă): buildShareLink() codează toate
+  // datele text în URL după #. Trebuie o PAGINĂ-VIZUALIZATOR la
+  // weddingdirection.ro/invitatie care:
+  //   - citește location.hash, face atob() + JSON.parse()
+  //   - randează șablonul ales cu aceleași funcții tplAcuarela/tplEditorial/tplSalvie
+  // (pozele NU încap în URL — vezi punctul 1: serviți-le din storage și
+  //  puneți URL-urile în payload).
+  //
+  // VARIANTA CURATĂ (RECOMANDAT): la salvare generați un slug unic
+  // (ex. /invitatie/maria-andrei-x7g2) servit de platformă din datele
+  // salvate. Înlocuiți 'base' din buildShareLink() cu acel URL.
+  //
+  // ───────────────────────────────────────────────────────────────
+  // 3) CONFIRMĂRILE (RSVP) — vezi fișierele individuale ale șabloanelor
+  // ───────────────────────────────────────────────────────────────
+  // În invitația publică, butoanele RSVP trimit răspunsul fie pe WhatsApp
+  // (gata), fie la un webhook (recomandat). Vezi funcția wdRSVP în fiecare
+  // șablon. WhatsApp-ul miresei vine din câmpul completat aici (D.whatsapp).
+  // ════════════════════════════════════════════════════════════════
+
+})();
+
+</script>
+</body>
+</html>
