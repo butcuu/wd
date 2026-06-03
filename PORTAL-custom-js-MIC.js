@@ -1,10 +1,6 @@
-/* ════════════════════════════════════════════════════════════
-   WEDDING DIRECTION — Loader instrumente (v5 - inaltime fixa, fara bucla)
-   Courses > Settings > Advanced > Custom JavaScript
-   ════════════════════════════════════════════════════════════ */
+/* WEDDING DIRECTION — Loader v6 (sus + scroll la instrument) */
 (function(){
   "use strict";
-
   var GH = "https://butcuu.github.io/wd/";
   var TOOLS = {
     "91ca406c-00bf-4a4c-ab24-f47971007e1c": "panou.html",
@@ -13,15 +9,13 @@
     "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f": "comparator.html",
     "6cbbe44b-cf37-4ed6-90c4-faa054da52d3": "creator.html"
   };
-  // inaltime fixa per instrument (px). Daca e mai inalt, scroll in interior.
   var HEIGHT = {
-    "91ca406c-00bf-4a4c-ab24-f47971007e1c": 1100, // panou
-    "48ea5cab-c32f-4ccb-a6c3-ba959f723785": 1500, // buget
-    "46f55aa5-48b0-4022-8161-5be7d1c9be34": 1600, // invitati
-    "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f": 1600, // comparator
-    "6cbbe44b-cf37-4ed6-90c4-faa054da52d3": 2000  // creator
+    "91ca406c-00bf-4a4c-ab24-f47971007e1c": 1100,
+    "48ea5cab-c32f-4ccb-a6c3-ba959f723785": 1500,
+    "46f55aa5-48b0-4022-8161-5be7d1c9be34": 1600,
+    "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f": 1600,
+    "6cbbe44b-cf37-4ed6-90c4-faa054da52d3": 2100
   };
-
   function getCid(){
     try{
       for(var i=0;i<localStorage.length;i++){
@@ -37,12 +31,10 @@
     }catch(e){}
     return "";
   }
-
   function currentLessonId(){
     var m = location.pathname.match(/posts\/([0-9a-f\-]{36})/i);
     return m ? m[1] : null;
   }
-
   function findHost(){
     var sels = [".post-content",".lesson-content",".course-post-content",
       "[class*=post-body]","[class*=postContent]","[class*=lesson]",
@@ -50,37 +42,39 @@
     for(var i=0;i<sels.length;i++){ var e=document.querySelector(sels[i]); if(e) return e; }
     return document.body;
   }
-
   function inject(){
     var lid = currentLessonId();
     if(!lid || !TOOLS[lid]) return;
     if(document.getElementById("wd-frame-"+lid)) return;
-
     var host = findHost();
     var cid = getCid();
     var src = GH + TOOLS[lid] + (cid ? ("?cid="+encodeURIComponent(cid)) : "");
     var h = HEIGHT[lid] || 1400;
 
+    // ascund continutul lectiei (titlu/comentarii) ca sa ramana doar instrumentul
+    try {
+      Array.prototype.forEach.call(host.children, function(ch){
+        ch.setAttribute("data-wd-hidden","1");
+        ch.style.display = "none";
+      });
+    } catch(e){}
+
     var f = document.createElement("iframe");
     f.id = "wd-frame-"+lid;
     f.src = src;
-    // inaltime FIXA, scroll permis in interior. Fara mesaje, fara bucla.
-    f.style.cssText = "width:100%;border:0;display:block;height:"+h+"px;background:#fcf8f3;border-radius:12px;margin:10px 0;";
+    f.style.cssText = "width:100%;border:0;display:block;height:"+h+"px;background:#fcf8f3;border-radius:12px;margin:0;";
     f.allow = "clipboard-write";
+    host.insertBefore(f, host.firstChild);
 
-    if(host.firstChild) host.insertBefore(f, host.firstChild);
-    else host.appendChild(f);
-
-    console.log("[WD] injectat:", TOOLS[lid], h+"px", "cid:", cid||"(lipsa)");
+    // scroll sus la instrument
+    setTimeout(function(){
+      try { window.scrollTo({top:0, behavior:"smooth"}); } catch(e){ window.scrollTo(0,0); }
+    }, 200);
   }
-
   function tryInject(){ setTimeout(inject, 600); }
   if(document.readyState!=="loading") tryInject(); else document.addEventListener("DOMContentLoaded", tryInject);
-
   var lastPath = location.pathname;
   setInterval(function(){
     if(location.pathname !== lastPath){ lastPath = location.pathname; tryInject(); }
   }, 700);
-
-  console.log("[WD] loader pornit v5 (inaltime fixa).");
 })();

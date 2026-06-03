@@ -256,12 +256,11 @@
 
     </div>
 
-    <!-- BARA DE JOS — navigare intre instrumente -->
-    <div class="bottom-bar" id="wd-navbar">
-      <a class="btn-back" data-nav="panou" href="#">⌂ Înapoi la panou</a>
-      <a class="btn-back" data-nav="buget" href="#">💰 Tracker buget</a>
-      <a class="btn-back" data-nav="invitati" href="#">👥 Tracker invitați</a>
-      <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator furnizori</a>
+    <!-- BARA DE JOS — înapoi la panou / clipuri -->
+    <!-- [DEV] {{link_panou}} = panoul personal · {{link_clipuri}} = zona de curs/clipuri -->
+    <div class="bottom-bar">
+      <a class="btn-back" href="{{link_panou}}">⌂ Înapoi la panou</a>
+      <a class="btn-back" href="{{link_clipuri}}">← Înapoi la clipuri</a>
     </div>
 
   </div>
@@ -281,9 +280,7 @@
   };
   var current='acuarela';
 
-  // ═══════════════════════════════════════════════════════════
-  //  [WD] CONEXIUNE val.town (citire/scriere/upload poze)
-  // ═══════════════════════════════════════════════════════════
+  // ════ CONEXIUNE val.town ════
   var WD_API="https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
   function wdGetCid(){
     try{ var p=new URLSearchParams(location.search); if(p.get("cid")) return p.get("cid"); }catch(e){}
@@ -302,18 +299,6 @@
     return null;
   }
   var WD_CID=wdGetCid();
-
-  // ── leg butoanele de navigare catre celelalte instrumente ──
-  (function wdBindNav(){
-    var LB="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
-    var Q=WD_CID?("?cid="+encodeURIComponent(WD_CID)):"";
-    var IDS={panou:"91ca406c-00bf-4a4c-ab24-f47971007e1c",buget:"48ea5cab-c32f-4ccb-a6c3-ba959f723785",invitati:"46f55aa5-48b0-4022-8161-5be7d1c9be34",comparator:"c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f"};
-    document.querySelectorAll('#wd-navbar [data-nav]').forEach(function(a){
-      var id=IDS[a.getAttribute('data-nav')]; if(id) a.href=LB+id+Q;
-    });
-  })();
-
-  // urca o poza prin val.town -> intoarce URL (callback)
   function wdUploadPhoto(file,onDone,onErr){
     var fd=new FormData(); fd.append("file",file,file.name||"poza.jpg");
     fetch(WD_API+"?action=upload",{method:"POST",body:fd})
@@ -321,8 +306,6 @@
       .then(function(j){ if(j&&j.ok&&j.url) onDone(j.url); else onErr&&onErr(); })
       .catch(function(){ onErr&&onErr(); });
   }
-
-  // incarca datele salvate ale miresei
   function wdLoadInvitatie(cb){
     if(!WD_CID){ cb&&cb(); return; }
     fetch(WD_API+"?cid="+encodeURIComponent(WD_CID))
@@ -330,19 +313,14 @@
       .then(function(j){
         if(j&&j.ok){
           if(j.invitatieJson&&typeof j.invitatieJson==="string"&&j.invitatieJson.charAt(0)==="{"){
-            try{
-              var saved=JSON.parse(j.invitatieJson);
-              if(saved&&saved.date){ D=Object.assign(D,saved.date); if(saved.sablon_ales) current=saved.sablon_ales; }
-            }catch(e){}
+            try{ var saved=JSON.parse(j.invitatieJson); if(saved&&saved.date){ D=Object.assign(D,saved.date); if(saved.sablon_ales) current=saved.sablon_ales; } }catch(e){}
           }
-          // pre-completez din cont daca lipsesc
           if(!D.data && j.dataNuntii) D.data=j.dataNuntii;
         }
         cb&&cb();
       })
       .catch(function(){ cb&&cb(); });
   }
-
 
   // ═══ HELPERS ═══
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -430,13 +408,7 @@
     '<section class="rsvp"><div class="leaf">❧</div><h2>Confirmă prezența</h2><p>Ne-ar bucura nespus să te avem alături.</p><div class="rsvp-deadline">'+ph(D.deadline,'')+'</div>'+
     '<div class="btns"><button class="btn-soft">Voi fi prezent(ă)</button><button class="btn-soft btn-ghost">Din păcate, nu pot ajunge</button></div></section>'+
     '<div class="footer"><div class="f-leaf">❧</div><div class="f-names">'+ph(D.mireasa,'Maria')+' &amp; '+ph(D.mire,'Andrei')+'</div><div class="f-date">'+dataText()+'</div></div>'+
-    '</div>'+cdScript()+'
-
-
-
-
-
-</body></html>';
+    '</div>'+cdScript()+'</body></html>';
   }
 
   // —————————————————— ȘABLON EDITORIAL NEUTRU ——————————————————
@@ -620,26 +592,17 @@
   // pornesc ora implicită
   D.ora=document.getElementById('f-ora').value||'17:00';
 
-  // ═══ UPLOAD POZE (urcate in GHL prin val.town, pastram URL) ═══
+  // ═══ UPLOAD POZE (preview local prin DataURL) ═══
   function bindPhoto(inputId,thumbId,key){
     var inp=document.getElementById(inputId), thumb=document.getElementById(thumbId);
     inp.addEventListener('change',function(){
       var file=inp.files&&inp.files[0]; if(!file)return;
-      // preview imediat local (DataURL) cat se urca
       var reader=new FileReader();
       reader.onload=function(e){ thumb.src=e.target.result; thumb.classList.remove('empty'); };
       reader.readAsDataURL(file);
-      // urc in GHL si pastrez URL-ul (nu base64 — e prea mare pt salvare)
-      var lbl=inp.closest('.up-btn'); if(lbl){ lbl.setAttribute('data-up','Se urcă...'); }
       wdUploadPhoto(file, function(url){
-        D[key]=url;                          // URL-ul real (mic, se salveaza ok)
-        thumb.src=url; thumb.classList.remove('empty');
-        if(lbl) lbl.removeAttribute('data-up');
-        scheduleRender();
-      }, function(){
-        if(lbl) lbl.removeAttribute('data-up');
-        alert('Poza nu s-a putut urca. Mai încearcă, sau folosește o poză mai mică.');
-      });
+        D[key]=url; thumb.src=url; thumb.classList.remove('empty'); scheduleRender();
+      }, function(){ alert('Poza nu s-a putut urca. Mai încearcă cu o poză mai mică.'); });
     });
   }
   bindPhoto('up-cover','thumb-cover','cover');
@@ -674,16 +637,13 @@
   var rt;
   function scheduleRender(){ clearTimeout(rt); rt=setTimeout(function(){ renderPreview(); refreshLink(); },220); }
 
-  // randare inițială — după ce încărcăm datele salvate ale miresei
+  // randare inițială — după ce încărcăm datele salvate
   wdLoadInvitatie(function(){
-    // re-sincronizez câmpurile din formular cu D (dacă au venit date salvate)
     try{
       var map={'f-mireasa':'mireasa','f-mire':'mire','f-data':'data','f-ora':'ora','f-oras':'oras','f-poveste':'poveste','f-bis-nume':'bisNume','f-bis-ora':'bisOra','f-bis-adr':'bisAdr','f-bis-harta':'bisHarta','f-loc-nume':'locNume','f-loc-ora':'locOra','f-loc-adr':'locAdr','f-loc-harta':'locHarta','f-deadline':'deadline','f-whatsapp':'whatsapp'};
       Object.keys(map).forEach(function(id){ var e=document.getElementById(id); if(e&&D[map[id]]!=null&&D[map[id]]!=="") e.value=D[map[id]]; });
-      // poze
       if(D.cover){ var tc=document.getElementById('thumb-cover'); if(tc){tc.src=D.cover;tc.classList.remove('empty');} }
       if(D.story){ var ts=document.getElementById('thumb-story'); if(ts){ts.src=D.story;ts.classList.remove('empty');} }
-      // tab activ
       root.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-tpl')===current); });
     }catch(e){}
     renderPreview(); refreshLink();
@@ -710,12 +670,8 @@
   //
   function wdSaveInvitatie(){
     var payload={ sablon_ales: current, date: D };
-    if(!WD_CID){
-      alert('Nu te-am putut identifica — deschide pagina din contul tău (din panou).');
-      return;
-    }
-    var btn=document.getElementById('btn-save');
-    var oldTxt=btn?btn.textContent:'';
+    if(!WD_CID){ alert('Nu te-am putut identifica — deschide pagina din contul tău (din panou).'); return; }
+    var btn=document.getElementById('btn-save'); var old=btn?btn.textContent:'';
     if(btn){ btn.disabled=true; btn.textContent='Se salvează...'; }
     fetch(WD_API+"?cid="+encodeURIComponent(WD_CID),{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -723,18 +679,12 @@
     })
     .then(function(r){return r.json();})
     .then(function(j){
-      if(btn){ btn.disabled=false; btn.textContent=oldTxt; }
-      if(j&&(j.ok||j.salvat)){
-        try{ window.name='WD_INV:'+JSON.stringify(payload); }catch(e){}
-        alert('Invitația ta a fost salvată în contul tău! ✓\n\nApasă „Copiază" sau „Trimite pe WhatsApp" ca să o trimiți invitaților.');
-      } else {
-        alert('Nu s-a putut salva. Mai încearcă peste un moment.');
-      }
+      if(btn){ btn.disabled=false; btn.textContent=old; }
+      if(j&&(j.ok||j.salvat)){ try{ window.name='WD_INV:'+JSON.stringify(payload); }catch(e){}
+        alert('Invitația ta a fost salvată în contul tău! ✓'); }
+      else alert('Nu s-a putut salva. Mai încearcă.');
     })
-    .catch(function(){
-      if(btn){ btn.disabled=false; btn.textContent=oldTxt; }
-      alert('Eroare la salvare. Verifică conexiunea și mai încearcă.');
-    });
+    .catch(function(){ if(btn){ btn.disabled=false; btn.textContent=old; } alert('Eroare la salvare.'); });
   }
   //
   // ───────────────────────────────────────────────────────────────
