@@ -301,7 +301,7 @@
       <a class="btn-back" data-nav="panou" href="#">⌂ Înapoi la panou</a>
       <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator</a>
       <a class="btn-back" data-nav="creator" href="#">💌 Creează invitația</a>
-      <a class="btn-back" href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e" target="_top">← Înapoi la video</a>
+      <a class="btn-back" href="https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e" target="_top">← Înapoi la video</a>
     </div>
 
   </div>
@@ -333,7 +333,7 @@
 
   // ── leg butoanele de navigare catre celelalte instrumente ──
   (function wdBindNav(){
-    var LB="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
+    var LB="https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
     var Q=WD_CID?("?cid="+encodeURIComponent(WD_CID)):"";
     var IDS={panou:"91ca406c-00bf-4a4c-ab24-f47971007e1c",buget:"48ea5cab-c32f-4ccb-a6c3-ba959f723785",comparator:"c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f",creator:"6cbbe44b-cf37-4ed6-90c4-faa054da52d3"};
     document.querySelectorAll('[data-nav]').forEach(function(a){ var id=IDS[a.getAttribute('data-nav')]; if(id) a.href=LB+id+Q; });
@@ -516,20 +516,35 @@
 
 
 
+
+
 <script>
-/* WD: raportez inaltimea reala catre portal (mobil-friendly, ResizeObserver) */
+/* WD: raportez inaltimea reala catre portal (mobil-friendly v3) */
 (function(){
   var lastSent = 0;
   function calcH(){
-    return Math.max(
-      document.body.scrollHeight, document.documentElement.scrollHeight,
-      document.body.offsetHeight, document.documentElement.offsetHeight
+    var b = document.body, e = document.documentElement;
+    // masor inaltimea reala a continutului
+    var h = Math.max(
+      b.scrollHeight, b.offsetHeight,
+      e.scrollHeight, e.offsetHeight, e.clientHeight
     );
+    // verific si ultimul element vizibil (footer/butoane), ca sa nu tai nimic
+    try {
+      var all = b.getElementsByTagName("*");
+      if(all.length){
+        var last = all[all.length-1];
+        var r = last.getBoundingClientRect();
+        var bottom = r.bottom + (window.pageYOffset||0);
+        if(bottom > h) h = bottom;
+      }
+    } catch(e2){}
+    return Math.ceil(h);
   }
   function reportHeight(){
     try {
       var h = calcH();
-      if (Math.abs(h - lastSent) > 15 && h > 100) {
+      if (Math.abs(h - lastSent) > 12 && h > 100) {
         lastSent = h;
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ wdHeight: h }, "*");
@@ -537,21 +552,19 @@
       }
     } catch(e){}
   }
-  // raportez la load
-  if (document.readyState === "complete") setTimeout(reportHeight, 200);
-  else window.addEventListener("load", function(){ setTimeout(reportHeight, 200); });
-  // ResizeObserver: raporteaza ORI DE CATE ORI se schimba inaltimea (tab nou, rubrica, etc.)
+  if (document.readyState === "complete") setTimeout(reportHeight, 150);
+  else window.addEventListener("load", function(){ setTimeout(reportHeight, 150); });
   try {
     if (window.ResizeObserver) {
       var ro = new ResizeObserver(function(){ reportHeight(); });
       ro.observe(document.body);
+      ro.observe(document.documentElement);
     }
   } catch(e){}
-  // fallback: verific periodic (rar, doar ca plasa de siguranta)
-  setInterval(reportHeight, 1000);
-  // raportez si la orice click/input (cand mireasa interactioneaza)
-  document.addEventListener("click", function(){ setTimeout(reportHeight, 250); });
-  document.addEventListener("input", function(){ setTimeout(reportHeight, 250); });
+  setInterval(reportHeight, 800);
+  document.addEventListener("click", function(){ setTimeout(reportHeight, 200); setTimeout(reportHeight, 500); });
+  document.addEventListener("input", function(){ setTimeout(reportHeight, 200); });
+  window.addEventListener("resize", function(){ setTimeout(reportHeight, 150); });
 })();
 </script>
 

@@ -1,4 +1,3 @@
-/* WEDDING DIRECTION — Loader v7 (auto-inaltime stabila + scroll sus) */
 (function(){
   "use strict";
   var GH = "https://butcuu.github.io/wd/";
@@ -80,6 +79,7 @@
     f.id = "wd-frame-"+lid;
     f.src = src;
     f.style.cssText = "width:100%;border:0;display:block;height:"+h+"px;background:#fcf8f3;border-radius:12px;margin:0;";
+    f.setAttribute("scrolling","no");
     f.allow = "clipboard-write";
     host.insertBefore(f, host.firstChild);
     theFrame = f; lastH = h;
