@@ -258,9 +258,12 @@
 
     <!-- BARA DE JOS — înapoi la panou / clipuri -->
     <!-- [DEV] {{link_panou}} = panoul personal · {{link_clipuri}} = zona de curs/clipuri -->
-    <div class="bottom-bar">
-      <a class="btn-back" href="{{link_panou}}">⌂ Înapoi la panou</a>
-      <a class="btn-back" href="{{link_clipuri}}">← Înapoi la clipuri</a>
+    <div class="bottom-bar" id="wd-navbar">
+      <a class="btn-back" data-nav="panou" href="#">⌂ Înapoi la panou</a>
+      <a class="btn-back" data-nav="buget" href="#">💰 Tracker buget</a>
+      <a class="btn-back" data-nav="invitati" href="#">👥 Tracker invitați</a>
+      <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator</a>
+      <a class="btn-back" data-nav="curs" href="#">← Înapoi la curs</a>
     </div>
 
   </div>
@@ -299,6 +302,18 @@
     return null;
   }
   var WD_CID=wdGetCid();
+
+  // ── leg butoanele de navigare ──
+  (function(){
+    var LB="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
+    var Q=WD_CID?("?cid="+encodeURIComponent(WD_CID)):"";
+    var IDS={panou:"91ca406c-00bf-4a4c-ab24-f47971007e1c",buget:"48ea5cab-c32f-4ccb-a6c3-ba959f723785",invitati:"46f55aa5-48b0-4022-8161-5be7d1c9be34",comparator:"c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f"};
+    document.querySelectorAll('#wd-navbar [data-nav]').forEach(function(a){
+      var key=a.getAttribute('data-nav');
+      if(key==="curs"){ a.href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses"; }
+      else { var id=IDS[key]; if(id) a.href=LB+id+Q; }
+    });
+  })();
   function wdUploadPhoto(file,onDone,onErr){
     var fd=new FormData(); fd.append("file",file,file.name||"poza.jpg");
     fetch(WD_API+"?action=upload",{method:"POST",body:fd})
@@ -566,7 +581,7 @@
     for(var key in keys){ if(D[key]) payload[keys[key]]=D[key]; }
     var encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
     // [DEV] înlocuiți baza cu URL-ul real al paginii-vizualizator din platformă:
-    var base='https://weddingdirection.ro/invitatie';
+    var base='https://butcuu.github.io/wd/invitatie.html';
     return base+'#'+encoded;
   }
   function refreshLink(){
