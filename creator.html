@@ -283,10 +283,10 @@
     <!-- BARA DE JOS — înapoi la panou / clipuri -->
     <!-- [DEV] {{link_panou}} = panoul personal · {{link_clipuri}} = zona de curs/clipuri -->
     <div class="bottom-bar" id="wd-navbar">
-      <a class="btn-back" data-nav="panou" href="#">⌂ Înapoi la panou</a>
-      <a class="btn-back" data-nav="buget" href="#">💰 Tracker buget</a>
-      <a class="btn-back" data-nav="invitati" href="#">👥 Tracker invitați</a>
-      <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator</a>
+      <a class="btn-back" data-nav="panou" href="#">🏠 Panoul meu</a>
+      <a class="btn-back" data-nav="buget" href="#">💰 Buget</a>
+      <a class="btn-back" data-nav="invitati" href="#">👥 Invitați</a>
+      <a class="btn-back" data-nav="comparator" href="#">⚖️ Furnizori</a>
       <a class="btn-back" href="https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e" target="_top">← Înapoi la video</a>
     </div>
 
@@ -771,39 +771,37 @@
 
 
 
+
+
 <script>
 (function(){
-  var lastSent = 0;
-  function reportHeight(){
+  var last = 0;
+  function send(){
     try {
-      // inaltimea reala a continutului paginii (simplu, fara bucle)
-      var h = document.documentElement.scrollHeight || document.body.scrollHeight;
-      if (h > 100 && Math.abs(h - lastSent) > 10) {
-        lastSent = h;
+      var h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0,
+        document.documentElement.offsetHeight
+      );
+      if (h > 100 && Math.abs(h - last) > 3) {
+        last = h;
         if (window.parent && window.parent !== window) {
           window.parent.postMessage({ wdHeight: h }, "*");
         }
       }
     } catch(e){}
   }
-  function start(){
-    reportHeight();
-    // raportez din nou dupa ce se aseaza fonturile/imaginile
-    setTimeout(reportHeight, 300);
-    setTimeout(reportHeight, 800);
-    setTimeout(reportHeight, 1500);
-    // observ schimbarile de continut (tab nou, rubrica adaugata, etc.)
-    try {
-      if (window.ResizeObserver) {
-        new ResizeObserver(function(){ reportHeight(); }).observe(document.documentElement);
-      }
-    } catch(e){}
-    // la interactiune (click/typing) reverific
-    document.addEventListener("click", function(){ setTimeout(reportHeight, 300); });
-    document.addEventListener("input", function(){ setTimeout(reportHeight, 300); });
-  }
-  if (document.readyState === "complete") start();
-  else window.addEventListener("load", start);
+  // raportez la load + dupa asezarea fonturilor/imaginilor
+  if (document.readyState === "complete") send();
+  else window.addEventListener("load", send);
+  // raportez PERMANENT (lejer) - prinde orice schimbare, oricat de tarziu
+  setInterval(send, 500);
+  // si imediat la schimbari de continut
+  try {
+    if (window.ResizeObserver) {
+      new ResizeObserver(send).observe(document.documentElement);
+    }
+  } catch(e){}
 })();
 </script>
 
