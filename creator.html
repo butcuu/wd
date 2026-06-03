@@ -131,154 +131,22 @@
 
 <div id="wd-creator">
 
-  <!-- ═══ HEADER ═══ -->
+  <!-- ═══ MESAJ IN LUCRU (temporar) ═══ -->
   <div class="hero">
     <div class="kick">Wedding Direction</div>
     <h1>Creează-ți invitația de nuntă</h1>
-    <p>Completează datele o singură dată. Le vezi pe loc pe trei modele diferite, alegi preferatul și trimiți linkul invitaților.</p>
   </div>
 
-  <div class="layout">
-
-    <!-- ═══════════ COLOANA STÂNGA: FORMULAR ═══════════ -->
-    <div class="form-col">
-
-      <div class="panel">
-        <h2><span class="ic">💑</span> Despre voi</h2>
-        <div class="hint">Numele care apar pe invitație.</div>
-        <div class="row2">
-          <div class="field"><label>Numele miresei</label><input type="text" id="f-mireasa" placeholder="Maria"></div>
-          <div class="field"><label>Numele mirelui</label><input type="text" id="f-mire" placeholder="Andrei"></div>
-        </div>
-        <div class="field">
-          <label>Data nunții</label>
-          <div class="row2">
-            <input type="date" id="f-data">
-            <input type="time" id="f-ora" value="17:00">
-          </div>
-          <div class="sub">Apare ca text frumos pe invitație + pornește numărătoarea inversă.</div>
-        </div>
-        <div class="field"><label>Orașul</label><input type="text" id="f-oras" placeholder="București"></div>
-      </div>
-
-      <div class="panel">
-        <h2><span class="ic">📷</span> Fotografiile voastre</h2>
-        <div class="hint">O poză mare de copertă și una pentru „Povestea noastră".</div>
-        <div class="field">
-          <label>Poza de copertă</label>
-          <div class="photo-up">
-            <img class="photo-thumb empty" id="thumb-cover" alt="">
-            <div class="up-btn"><label for="up-cover">Încarcă poza</label><input type="file" id="up-cover" accept="image/*"></div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Poza pentru „Povestea noastră"</label>
-          <div class="photo-up">
-            <img class="photo-thumb empty" id="thumb-story" alt="">
-            <div class="up-btn"><label for="up-story">Încarcă poza</label><input type="file" id="up-story" accept="image/*"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2><span class="ic">💌</span> Povestea voastră</h2>
-        <div class="hint">Câteva rânduri despre voi — cum v-ați cunoscut, cererea, orice.</div>
-        <div class="field">
-          <textarea id="f-poveste" placeholder="Ne-am cunoscut într-o după-amiază de octombrie..."></textarea>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2><span class="ic">⛪</span> Ceremonia religioasă</h2>
-        <div class="field"><label>Numele bisericii</label><input type="text" id="f-bis-nume" placeholder="Biserica Sfântul Nicolae"></div>
-        <div class="field"><label>Ora</label><input type="text" id="f-bis-ora" placeholder="Ora 18:00"></div>
-        <div class="field"><label>Adresa</label><input type="text" id="f-bis-adr" placeholder="Strada Bisericii nr. 12, București"></div>
-        <div class="field"><label>Caută pe hartă (pentru buton)</label><input type="text" id="f-bis-harta" placeholder="Biserica Sfantul Nicolae Bucuresti"><div class="sub">Numele locului așa cum apare în Google Maps.</div></div>
-      </div>
-
-      <div class="panel">
-        <h2><span class="ic">🥂</span> Petrecerea</h2>
-        <div class="field"><label>Numele localului</label><input type="text" id="f-loc-nume" placeholder="Grand Ballroom"></div>
-        <div class="field"><label>Ora</label><input type="text" id="f-loc-ora" placeholder="Ora 20:00"></div>
-        <div class="field"><label>Adresa</label><input type="text" id="f-loc-adr" placeholder="Bulevardul Primăverii nr. 45, București"></div>
-        <div class="field"><label>Caută pe hartă (pentru buton)</label><input type="text" id="f-loc-harta" placeholder="Grand Ballroom Bucuresti"></div>
-      </div>
-
-      <div class="panel">
-        <h2><span class="ic">✉️</span> Confirmare prezență</h2>
-        <div class="field"><label>Până când să confirme invitații</label><input type="text" id="f-deadline" placeholder="Confirmă până pe 1 Aprilie 2027"></div>
-        <div class="field"><label>WhatsApp-ul vostru (primiți confirmările)</label><input type="tel" id="f-whatsapp" placeholder="0757 588 885"><div class="sub">Aici primiți mesajele de confirmare de la invitați.</div></div>
-      </div>
-
+  <div style="max-width:680px;margin:0 auto;padding:48px 24px;text-align:center">
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:48px 32px">
+      <div style="font-size:54px;margin-bottom:18px">💌</div>
+      <h2 style="font-family:var(--serif);font-size:30px;font-weight:600;color:var(--ink);margin-bottom:14px">Instrumentul e în lucru</h2>
+      <p style="font-size:16px;color:var(--ink);opacity:.75;line-height:1.7;max-width:460px;margin:0 auto 8px">
+        Lucrăm la creatorul de invitații ca să-ți iasă perfect. Revino în curând — îl găsești tot aici, gata de folosit.
+      </p>
+      <p style="font-size:14px;color:var(--gold-dark);font-weight:500;margin-top:20px">Mulțumim de răbdare 🤍</p>
     </div>
-
-    <!-- ═══════════ COLOANA DREAPTA: PREVIEW LIVE ═══════════ -->
-    <div class="preview-col">
-
-      <div class="tabs">
-        <div class="tab active" data-tpl="acuarela">
-          <div class="t-name">Acuarelă</div>
-          <div class="t-desc">Romantic, blush & sage</div>
-        </div>
-        <div class="tab" data-tpl="editorial">
-          <div class="t-name">Editorial</div>
-          <div class="t-desc">Modern, neutru & auriu</div>
-        </div>
-        <div class="tab" data-tpl="salvie">
-          <div class="t-name">Salvie</div>
-          <div class="t-desc">Elegant, verde & auriu</div>
-        </div>
-      </div>
-
-      <div class="stage">
-        <div class="stage-bar">
-          <div class="dots"><span></span><span></span><span></span></div>
-          <div class="lbl">Previzualizare live — exact ce vor vedea invitații</div>
-        </div>
-        <iframe id="preview" title="Previzualizare invitație"></iframe>
-      </div>
-
-      <!-- ACȚIUNI -->
-      <div class="actions">
-        <h3>Trimite invitația</h3>
-        <div class="ah">Ai 3 modele. Alege linkul modelului preferat și trimite-l invitaților:</div>
-
-        <div class="link3" data-m="acuarela">
-          <div class="link3-lbl">🌸 Acuarelă <span>— romantic, blush & sage</span></div>
-          <div class="link-box">
-            <input type="text" id="share-acuarela" readonly value="">
-            <button class="btn btn-ghost btn-copy3" data-copy="share-acuarela">Copiază</button>
-          </div>
-        </div>
-
-        <div class="link3" data-m="editorial">
-          <div class="link3-lbl">📋 Editorial <span>— modern, neutru & auriu</span></div>
-          <div class="link-box">
-            <input type="text" id="share-editorial" readonly value="">
-            <button class="btn btn-ghost btn-copy3" data-copy="share-editorial">Copiază</button>
-          </div>
-        </div>
-
-        <div class="link3" data-m="salvie">
-          <div class="link3-lbl">🌿 Salvie <span>— elegant, verde & auriu</span></div>
-          <div class="link-box">
-            <input type="text" id="share-salvie" readonly value="">
-            <button class="btn btn-ghost btn-copy3" data-copy="share-salvie">Copiază</button>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <a class="btn btn-wa" id="btn-wa" target="_blank">Trimite pe WhatsApp modelul ales (<b id="chosen-name">Acuarelă</b>)</a>
-          <button class="btn btn-gold" id="btn-save">Salvează invitația</button>
-        </div>
-        <div class="copied" id="copied-msg">✓ Link copiat! Acum îl poți trimite oricui.</div>
-
-        <div class="save-note">
-          <b>Cum primești confirmările:</b> când un invitat apasă „Confirmă prezența" pe invitația ta, mesajul (nume + număr de persoane) ajunge direct pe WhatsApp-ul tău. Le poți bifa apoi în <b>Trackerul de invitați</b>.
-        </div>
-      </div>
-
-    </div>
+  </div>
 
     <!-- BARA DE JOS — înapoi la panou / clipuri -->
     <!-- [DEV] {{link_panou}} = panoul personal · {{link_clipuri}} = zona de curs/clipuri -->
@@ -338,6 +206,8 @@
       else { var id=IDS[key]; if(id) a.href=LB+id+Q; }
     });
   })();
+  // MOD IN LUCRU: daca formularul nu exista, opresc aici (nav-ul deja e legat mai sus)
+  if(!document.getElementById('f-ora')){ return; }
   function wdUploadPhoto(file,onDone,onErr){
     var fd=new FormData(); fd.append("file",file,file.name||"poza.jpg");
     fetch(WD_API+"?action=upload",{method:"POST",body:fd})
