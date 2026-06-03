@@ -186,13 +186,13 @@
         tool("comparator","⚖️","ic-sage","Comparator furnizori","Pune furnizorii față în față și alege pe valoare, nu doar pe preț.",qs)+
         tool("creator","💌","ic-blue","Creează invitația","Invitația ta, gata în câteva minute. Cu poză și RSVP.",qs)+
       '</div>'+
-      '<div class="backbar"><a href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net" data-back>← Înapoi la video</a></div>';
+      '<div class="backbar"><a href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e" data-back>← Înapoi la video</a></div>';
 
     el("wd-root").innerHTML = '<div class="hero">'+salut+'</div>'+cd+stats+menu;
 
     // leg butonul inapoi la curs (prima lectie / outline) — il las # pana decizi
     var bk=document.querySelector('#wd-panou [data-back]');
-    if(bk) bk.onclick=function(e){ e.preventDefault(); window.top.location.href='https://vsu1yqyciwfpxmbuclmi.app.clientclub.net'; };
+    if(bk) bk.onclick=function(e){ e.preventDefault(); window.top.location.href='https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e'; };
   }
 
   function tool(key,ic,cls,title,desc,qs){
@@ -211,6 +211,48 @@
 
 
 
+
+
+
+
+<script>
+/* WD: raportez inaltimea reala catre portal (mobil-friendly, ResizeObserver) */
+(function(){
+  var lastSent = 0;
+  function calcH(){
+    return Math.max(
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight, document.documentElement.offsetHeight
+    );
+  }
+  function reportHeight(){
+    try {
+      var h = calcH();
+      if (Math.abs(h - lastSent) > 15 && h > 100) {
+        lastSent = h;
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ wdHeight: h }, "*");
+        }
+      }
+    } catch(e){}
+  }
+  // raportez la load
+  if (document.readyState === "complete") setTimeout(reportHeight, 200);
+  else window.addEventListener("load", function(){ setTimeout(reportHeight, 200); });
+  // ResizeObserver: raporteaza ORI DE CATE ORI se schimba inaltimea (tab nou, rubrica, etc.)
+  try {
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function(){ reportHeight(); });
+      ro.observe(document.body);
+    }
+  } catch(e){}
+  // fallback: verific periodic (rar, doar ca plasa de siguranta)
+  setInterval(reportHeight, 1000);
+  // raportez si la orice click/input (cand mireasa interactioneaza)
+  document.addEventListener("click", function(){ setTimeout(reportHeight, 250); });
+  document.addEventListener("input", function(){ setTimeout(reportHeight, 250); });
+})();
+</script>
 
 </body>
 </html>
