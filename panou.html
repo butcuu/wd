@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Wedding Direction — Panoul tău</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+#wd-panou *{margin:0;padding:0;box-sizing:border-box}
+#wd-panou{
+  --gold:#b7934f; --gold-dark:#9b7938; --gold-soft:#f6eedf;
+  --rose:#c98d7c; --rose-soft:#fbefeb;
+  --sage:#7f9f73; --sage-soft:#eef5eb;
+  --blue:#7392b3; --blue-soft:#edf3f9;
+  --ink:#2b2622; --text:#4f463f; --paper:#fcf8f3;
+  --line:#e9e0d2;
+  font-family:'Inter',sans-serif; color:var(--text);
+  background:var(--paper); min-height:100vh;
+  padding:24px 16px 60px; line-height:1.6;
+}
+#wd-panou .serif{font-family:'Cormorant Garamond',serif}
+#wd-panou .topbar{height:5px;background:linear-gradient(90deg,var(--gold),var(--rose),var(--gold));border-radius:5px;max-width:980px;margin:0 auto 26px}
+
+/* HERO bun venit */
+#wd-panou .hero{max-width:980px;margin:0 auto 30px;text-align:center}
+#wd-panou .brand{font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dark);font-weight:600}
+#wd-panou .brand small{display:block;font-size:10px;letter-spacing:2px;color:var(--rose);margin-top:2px;font-weight:500}
+#wd-panou .salut{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;color:var(--ink);margin:18px 0 6px;line-height:1.05}
+#wd-panou .salut .wave{font-size:34px}
+#wd-panou .salut-sub{font-size:16px;color:var(--text);max-width:520px;margin:0 auto}
+
+/* COUNTDOWN mare */
+#wd-panou .cd{max-width:980px;margin:0 auto 30px;background:linear-gradient(135deg,#fff,var(--gold-soft));border:1px solid var(--line);border-radius:20px;padding:30px 24px;text-align:center}
+#wd-panou .cd .lead{font-size:15px;color:var(--text);margin-bottom:10px}
+#wd-panou .cd .big{font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--gold-dark);line-height:1}
+#wd-panou .cd .big .num{font-size:84px;display:inline-block}
+#wd-panou .cd .big .lbl{font-size:26px;color:var(--ink);margin-left:8px}
+#wd-panou .cd .date{font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--rose);margin-top:10px;font-weight:500}
+#wd-panou .cd.nodate .big{font-size:30px;color:var(--ink)}
+@media(max-width:600px){#wd-panou .cd .big .num{font-size:60px}#wd-panou .salut{font-size:32px}}
+
+/* 3 CIFRE CHEIE */
+#wd-panou .stats{max-width:980px;margin:0 auto 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:600px){#wd-panou .stats{grid-template-columns:1fr}}
+#wd-panou .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center}
+#wd-panou .stat .si{font-size:24px;margin-bottom:6px}
+#wd-panou .stat .sv{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--ink);line-height:1.1}
+#wd-panou .stat .sv small{font-size:15px;color:var(--text);font-family:'Inter',sans-serif;font-weight:400}
+#wd-panou .stat .sl{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--gold-dark);font-weight:600;margin-top:5px}
+#wd-panou .stat .sx{font-size:12px;color:var(--text);margin-top:3px}
+
+/* MENIU instrumente */
+#wd-panou .menu-title{max-width:980px;margin:0 auto 16px;text-align:center}
+#wd-panou .menu-title h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--ink)}
+#wd-panou .menu-title p{font-size:14px;color:var(--text)}
+#wd-panou .menu{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){#wd-panou .menu{grid-template-columns:1fr}}
+#wd-panou .tool{display:flex;align-items:flex-start;gap:16px;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:24px;text-decoration:none;color:inherit;transition:all .15s;cursor:pointer}
+#wd-panou .tool:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(43,38,34,.08)}
+#wd-panou .tool .tic{width:54px;height:54px;flex-shrink:0;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px}
+#wd-panou .tool .tt{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1.1;margin-bottom:4px}
+#wd-panou .tool .td{font-size:13.5px;color:var(--text);line-height:1.4}
+#wd-panou .tool .tarrow{margin-left:auto;align-self:center;color:var(--gold);font-size:20px;opacity:0;transition:opacity .15s}
+#wd-panou .tool:hover .tarrow{opacity:1}
+#wd-panou .ic-gold{background:var(--gold-soft)}
+#wd-panou .ic-rose{background:var(--rose-soft)}
+#wd-panou .ic-sage{background:var(--sage-soft)}
+#wd-panou .ic-blue{background:var(--blue-soft)}
+
+/* nav jos */
+#wd-panou .backbar{max-width:980px;margin:34px auto 0;text-align:center}
+#wd-panou .backbar a{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);color:var(--text);text-decoration:none;font-weight:600;font-size:13px;padding:10px 20px;border-radius:22px}
+#wd-panou .backbar a:hover{border-color:var(--gold);color:var(--gold-dark)}
+
+#wd-panou .state{max-width:560px;margin:40px auto;text-align:center;padding:30px;background:#fff;border:1px solid var(--line);border-radius:16px}
+#wd-panou .state .ic{font-size:36px;margin-bottom:12px}
+#wd-panou .state h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ink);margin-bottom:8px}
+</style>
+</head>
+<body>
+<div id="wd-panou">
+
+  <div class="topbar"></div>
+  <div class="hero">
+    <div class="brand">Wedding Direction<small>by Oana</small></div>
+  </div>
+
+  <div id="wd-root">
+    <div class="state"><div class="ic">⏳</div><h2 class="serif">Se încarcă panoul tău...</h2></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var WD_API = "https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
+
+  // ── linkuri lectii (portal) ──
+  var BASE_LESSON = "https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
+  var LESSONS = {
+    buget:      "48ea5cab-c32f-4ccb-a6c3-ba959f723785",
+    invitati:   "46f55aa5-48b0-4022-8161-5be7d1c9be34",
+    comparator: "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f",
+    creator:    "6cbbe44b-cf37-4ed6-90c4-faa054da52d3"
+  };
+  function lessonUrl(key){ return BASE_LESSON + LESSONS[key]; }
+
+  function getCid(){
+    try{ var p=new URLSearchParams(location.search); if(p.get("cid")) return p.get("cid"); }catch(e){}
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k=localStorage.key(i);
+        if(k&&k.indexOf("firebase:authUser")>-1){
+          var d=JSON.parse(localStorage.getItem(k));
+          if(d&&d.stsTokenManager&&d.stsTokenManager.accessToken){
+            var pl=JSON.parse(atob(d.stsTokenManager.accessToken.split(".")[1].replace(/-/g,'+').replace(/_/g,'/')));
+            if(pl.contact_id) return pl.contact_id;
+          }
+        }
+      }
+    }catch(e){}
+    return null;
+  }
+  var CID=getCid();
+  function el(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?"":s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function fmtData(iso){
+    if(!iso) return "";
+    try{ var L=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
+      var d=new Date(iso); return d.getDate()+" "+L[d.getMonth()]+" "+d.getFullYear(); }catch(e){ return iso; }
+  }
+  function nr(v){ var n=parseInt(v,10); return isNaN(n)?0:n; }
+
+  function load(){
+    if(!CID){
+      el("wd-root").innerHTML='<div class="state"><div class="ic">🔒</div><h2 class="serif">Nu te-am putut identifica</h2><p>Reîncarcă pagina sau deschide-o din curs.</p></div>';
+      // afisez totusi meniul (fara date)
+      render({});
+      return;
+    }
+    fetch(WD_API+"?cid="+encodeURIComponent(CID))
+      .then(function(r){return r.json();})
+      .then(function(j){ render(j&&j.ok?j:{}); })
+      .catch(function(){ render({}); });
+  }
+
+  function render(d){
+    var nume = d.nume ? esc(d.nume) : "";
+    var zile = d.zileRamase;
+    var dataN = d.dataNuntii;
+
+    // HERO
+    var salut = '<div class="salut serif">Bună'+(nume?", "+nume:"")+'! <span class="wave">👋</span></div>'+
+                '<div class="salut-sub">Aici ai tot ce-ți trebuie ca să-ți organizezi nunta cu cap. Fără stres, pas cu pas.</div>';
+
+    // COUNTDOWN
+    var cd;
+    if(zile!=null && dataN){
+      cd = '<div class="cd"><div class="lead">Până la nunta ta mai sunt</div>'+
+           '<div class="big"><span class="num">'+zile+'</span><span class="lbl">'+(zile===1?'zi':'zile')+'</span></div>'+
+           '<div class="date">'+esc(fmtData(dataN))+'</div></div>';
+    } else {
+      cd = '<div class="cd nodate"><div class="lead">Data nunții</div>'+
+           '<div class="big">Încă nu ai stabilit data</div>'+
+           '<div class="date" style="text-transform:none;letter-spacing:0;color:var(--text)">O completezi când ești gata 💛</div></div>';
+    }
+
+    // STATS
+    var bugEst=nr(d.bugetEstimat), bugReal=nr(d.bugetReal);
+    var invTot=nr(d.invitatiTotal), invConf=nr(d.invitatiConfirmati);
+    var furn=nr(d.furnizoriConfirmati);
+    var stats = '<div class="stats">'+
+      '<div class="stat"><div class="si">💰</div><div class="sv">'+bugEst.toLocaleString("ro-RO")+' <small>lei</small></div><div class="sl">Buget estimat</div><div class="sx">'+(bugReal?'cheltuit: '+bugReal.toLocaleString("ro-RO")+' lei':'încă necompletat')+'</div></div>'+
+      '<div class="stat"><div class="si">👥</div><div class="sv">'+invTot+'</div><div class="sl">Invitați</div><div class="sx">'+(invConf?invConf+' confirmați':'încă necompletat')+'</div></div>'+
+      '<div class="stat"><div class="si">🤝</div><div class="sv">'+furn+'</div><div class="sl">Furnizori bifați</div><div class="sx">din cei de care ai nevoie</div></div>'+
+    '</div>';
+
+    // MENIU
+    var qs = CID ? ("?cid="+encodeURIComponent(CID)) : "";
+    var menu = '<div class="menu-title"><h2 class="serif">Instrumentele tale</h2><p>Tot ce-ți trebuie, într-un singur loc</p></div>'+
+      '<div class="menu">'+
+        tool("buget","💰","ic-gold","Tracker buget","Ține banii sub control, pe categorii — estimat, contractat, achitat.",qs)+
+        tool("invitati","👥","ic-rose","Tracker invitați","Lista completă, confirmările și metoda celor 3 cercuri.",qs)+
+        tool("comparator","⚖️","ic-sage","Comparator furnizori","Pune furnizorii față în față și alege pe valoare, nu doar pe preț.",qs)+
+        tool("creator","💌","ic-blue","Creează invitația","Invitația ta, gata în câteva minute. Cu poză și RSVP.",qs)+
+      '</div>'+
+      '<div class="backbar"><a href="#" data-back>← Înapoi la curs</a></div>';
+
+    el("wd-root").innerHTML = '<div class="hero">'+salut+'</div>'+cd+stats+menu;
+
+    // leg butonul inapoi la curs (prima lectie / outline) — il las # pana decizi
+    var bk=document.querySelector('#wd-panou [data-back]');
+    if(bk) bk.onclick=function(e){ e.preventDefault(); history.length>1?history.back():null; };
+  }
+
+  function tool(key,ic,cls,title,desc,qs){
+    return '<a class="tool" href="'+lessonUrl(key)+qs+'">'+
+      '<div class="tic '+cls+'">'+ic+'</div>'+
+      '<div><div class="tt">'+title+'</div><div class="td">'+desc+'</div></div>'+
+      '<div class="tarrow">→</div>'+
+    '</a>';
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Wedding Direction — Tracker invitați</title>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     TRACKER INVITAȚI — WEDDING DIRECTION
+     Construit pe METODA CELOR 3 CERCURI din scriptul Oanei (Stadiul 1, B1).
+     Două moduri:
+       TAB 1 — Estimare: cele 3 cercuri × (partea miresei / partea mirelui), pe numere.
+       TAB 2 — Listă nominală: invitați pe nume, cu cerc + status (confirmat/posibil/necontactat).
+     Toate calculele (totaluri pe cercuri, pe statusuri, %) SE FAC AUTOMAT în JS.
+     Dev-ii NU rescriu nicio formulă.
+
+     >>> CE FAC DEV-II (caută [DEV]) <<<
+     1. SALVARE: wdSave() / wdLoad() la finalul scriptului (la fel ca la tracker buget).
+     2. EXPORT ÎN FIȘĂ: wdExportInvitati() trimite total/confirmați/posibil/necontactați
+        în custom fields → apar automat în panoul personal.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#fcfaf7;--bg2:#f6f2ed;--bg3:#eee8df;
+    --card:#ffffff;--card-alt:#fdfbf8;
+    --ink:#2a2521;--ink2:#4d443c;--muted:#8f8478;--muted2:#b5aa9e;
+    --line:#e6ddd2;--line-light:#f0e9e0;
+    --gold:#b8974a;--gold-dark:#9a7a32;--gold-light:#f5edd8;--gold-glow:rgba(184,151,74,.12);
+    --rose:#d4a090;--rose-bg:#fdf3ef;
+    --sage:#8db07a;--sage-bg:#f1f7ee;
+    --blue:#7a9fc0;--blue-bg:#eef4fa;
+    --red:#c75a4a;--red-bg:#fdf0ee;
+    --green:#5da06a;--green-bg:#eef7f0;
+    --orange:#c9943a;--orange-bg:#fdf5e8;
+    --shadow-sm:0 1px 3px rgba(42,37,33,.05);
+    --shadow:0 2px 6px rgba(42,37,33,.04),0 8px 30px rgba(42,37,33,.06);
+    --r:18px;--r-sm:12px;--r-xs:8px;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Nunito Sans',system-ui,sans-serif;
+  }
+  #wd-inv *{box-sizing:border-box;margin:0;padding:0}
+  #wd-inv{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.5;font-size:14px;padding:26px 0 40px}
+  #wd-inv .wrap{width:min(1080px,calc(100% - 28px));margin:0 auto}
+
+  /* HEADER */
+  #wd-inv .iv-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  #wd-inv .iv-head h1{font-family:var(--serif);font-size:clamp(26px,3.2vw,36px);font-weight:700;line-height:1.1}
+  #wd-inv .iv-head p{font-size:14px;color:var(--muted);margin-top:2px;max-width:60ch}
+  #wd-inv .back-link{font-size:13px;font-weight:700;color:var(--gold-dark);text-decoration:none}
+  #wd-inv .back-link:hover{text-decoration:underline}
+
+  /* TABS */
+  #wd-inv .tabs{display:flex;gap:6px;background:var(--bg2);padding:5px;border-radius:999px;width:fit-content;margin-bottom:20px}
+  #wd-inv .tab{padding:9px 22px;border:none;background:transparent;border-radius:999px;font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.2s}
+  #wd-inv .tab.active{background:var(--card);color:var(--gold-dark);box-shadow:var(--shadow-sm)}
+  #wd-inv .panel{display:none}
+  #wd-inv .panel.active{display:block}
+
+  /* ===== TAB 1: ESTIMARE 3 CERCURI ===== */
+  #wd-inv .intro{background:var(--gold-glow);border-radius:var(--r-sm);padding:14px 18px;font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:18px}
+  #wd-inv .intro b{color:var(--gold-dark)}
+
+  #wd-inv .circle{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden}
+  #wd-inv .circle-head{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line)}
+  #wd-inv .circle-num{flex-shrink:0;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:22px;font-weight:700;color:#fff}
+  #wd-inv .c1 .circle-num{background:linear-gradient(135deg,var(--gold),var(--gold-light))}
+  #wd-inv .c2 .circle-num{background:linear-gradient(135deg,var(--rose),#e0b3a6)}
+  #wd-inv .c3 .circle-num{background:linear-gradient(135deg,var(--blue),#a3bfd6)}
+  #wd-inv .circle-info{flex:1}
+  #wd-inv .circle-info h3{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.1}
+  #wd-inv .circle-info p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  #wd-inv .circle-total{text-align:right}
+  #wd-inv .circle-total b{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--ink);line-height:1}
+  #wd-inv .circle-total span{display:block;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+
+  #wd-inv .circle-body{display:flex;gap:0;padding:0}
+  #wd-inv .side{flex:1;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  #wd-inv .side:first-child{border-right:1px solid var(--line-light)}
+  #wd-inv .side label{font-size:13px;font-weight:700;color:var(--ink2)}
+  #wd-inv .side .side-sub{font-size:11px;color:var(--muted2);font-weight:400}
+  #wd-inv .side input{width:90px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--r-xs);font-family:var(--serif);font-size:22px;font-weight:700;text-align:center;color:var(--gold-dark);background:var(--bg2)}
+  #wd-inv .side input:focus{outline:none;border-color:var(--gold)}
+
+  /* totaluri estimare */
+  #wd-inv .est-totals{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  @media(max-width:640px){#wd-inv .est-totals{grid-template-columns:1fr}}
+  #wd-inv .et-card{border-radius:var(--r);padding:20px 24px;border:1px solid var(--line)}
+  #wd-inv .et-card.key{background:linear-gradient(135deg,#fdf8ee,#fef5e0);border-color:rgba(184,151,74,.25)}
+  #wd-inv .et-card.all{background:var(--card);box-shadow:var(--shadow-sm)}
+  #wd-inv .et-lab{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+  #wd-inv .et-val{font-family:var(--serif);font-size:40px;font-weight:700;line-height:1}
+  #wd-inv .et-card.key .et-val{color:var(--gold-dark)}
+  #wd-inv .et-note{font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5}
+
+  /* exercitiul cercul 3 (cost) */
+  #wd-inv .c3-cost{background:var(--blue-bg);border:1px solid rgba(122,159,192,.3);border-radius:var(--r-sm);padding:16px 20px;margin-top:14px;font-size:13.5px;color:var(--ink2);line-height:1.6}
+  #wd-inv .c3-cost b{color:#5a7d9e}
+  #wd-inv .c3-cost .cost-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+  #wd-inv .c3-cost input{width:80px;padding:6px 10px;border:1px solid var(--line);border-radius:var(--r-xs);font-weight:700;text-align:center;background:#fff}
+  #wd-inv .c3-cost .cost-result{font-weight:800;color:var(--red)}
+
+  /* ===== TAB 2: LISTA NOMINALA ===== */
+  #wd-inv .status-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  @media(max-width:640px){#wd-inv .status-summary{grid-template-columns:1fr 1fr}}
+  #wd-inv .ss{border-radius:var(--r-sm);padding:16px 18px;border:1px solid var(--line);text-align:center}
+  #wd-inv .ss .ss-n{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1}
+  #wd-inv .ss .ss-l{font-size:11.5px;font-weight:700;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+  #wd-inv .ss.total{background:var(--card);box-shadow:var(--shadow-sm)}
+  #wd-inv .ss.conf{background:var(--green-bg)} #wd-inv .ss.conf .ss-n{color:var(--green)}
+  #wd-inv .ss.pos{background:var(--orange-bg)} #wd-inv .ss.pos .ss-n{color:var(--orange)}
+  #wd-inv .ss.nec{background:var(--bg2)} #wd-inv .ss.nec .ss-n{color:var(--muted)}
+
+  #wd-inv .list-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+  #wd-inv .list-head,#wd-inv .grow{display:grid;grid-template-columns:2fr 1.2fr 1.4fr 36px;gap:10px;align-items:center;padding:10px 20px}
+  #wd-inv .list-head{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted2);background:var(--card-alt);border-bottom:1px solid var(--line)}
+  #wd-inv .grow{border-top:1px solid var(--line-light)}
+  #wd-inv .grow input.g-name{width:100%;border:1px solid transparent;background:transparent;font-size:14px;font-weight:600;padding:7px 8px;border-radius:6px}
+  #wd-inv .grow input.g-name:focus{outline:none;border-color:var(--gold);background:var(--bg2)}
+  #wd-inv .grow select{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:var(--r-xs);font-family:var(--sans);font-size:12.5px;font-weight:600;background:#fff;cursor:pointer;color:var(--ink2)}
+  #wd-inv .grow .g-del{width:28px;height:28px;border:none;background:transparent;color:var(--muted2);cursor:pointer;border-radius:6px;font-size:15px}
+  #wd-inv .grow .g-del:hover{background:var(--red-bg);color:var(--red)}
+  #wd-inv select.st-conf{color:var(--green);font-weight:700}
+  #wd-inv select.st-pos{color:var(--orange);font-weight:700}
+  #wd-inv select.st-nec{color:var(--muted);font-weight:700}
+  #wd-inv .add-guest{margin:10px 20px 14px;display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border:1px dashed var(--gold);border-radius:var(--r-xs);background:var(--gold-light);color:var(--gold-dark);font-size:12.5px;font-weight:700;cursor:pointer}
+  #wd-inv .add-guest:hover{background:#f0e4c4}
+  #wd-inv .list-empty{padding:30px 20px;text-align:center;color:var(--muted);font-size:13.5px}
+
+  /* ACTIUNI */
+  #wd-inv .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;align-items:center;margin-top:18px}
+  #wd-inv .btn-save{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:999px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(184,151,74,.35);transition:.2s}
+  #wd-inv .btn-save:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(184,151,74,.5)}
+  #wd-inv .save-status{font-size:12px;color:var(--green);font-weight:700;opacity:0;transition:opacity .3s}
+  #wd-inv .save-status.show{opacity:1}
+
+  /* NAVIGARE JOS */
+  #wd-inv .nav-tools{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+  #wd-inv .nav-tools-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;text-align:center}
+  #wd-inv .nav-tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:640px){#wd-inv .nav-tools-grid{grid-template-columns:1fr}}
+  #wd-inv .nt-card{display:flex;align-items:center;gap:10px;padding:14px 18px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card-alt);text-decoration:none;color:var(--ink);font-size:14px;font-weight:700;transition:.2s}
+  #wd-inv .nt-card:hover{border-color:var(--gold);box-shadow:var(--shadow-sm);transform:translateY(-2px)}
+  #wd-inv .nt-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  #wd-inv .nt-ic.ic-gold{background:var(--gold-light)}
+  #wd-inv .nt-ic.ic-blue{background:var(--blue-bg)}
+  #wd-inv .nt-ic.ic-sage{background:var(--sage-bg)}
+  #wd-inv .bottom-bar{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+  #wd-inv .btn-back{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:999px;background:var(--card);border:1.5px solid var(--line);color:var(--ink2);font-size:14px;font-weight:700;text-decoration:none;transition:.25s}
+  #wd-inv .btn-back:hover{border-color:var(--gold);color:var(--gold-dark);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+
+<div id="wd-inv">
+  <div class="wrap">
+
+    <div class="iv-head">
+      <div>
+        <h1>Tracker invitați</h1>
+        <p>Întâi estimezi pe cele 3 cercuri (doar numere). Apoi, când ești gata, adaugi invitații pe nume cu status. Totalul se recalculează singur.</p>
+      </div>
+      <!-- [DEV] {{link_panou}} -->
+      <a class="back-link" data-nav="panou" href="#">← Înapoi la panou</a>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="est">① Estimare (3 cercuri)</button>
+      <button class="tab" data-tab="list">② Listă pe nume</button>
+    </div>
+
+    <!-- ════════ TAB 1: ESTIMARE ════════ -->
+    <div class="panel active" id="panel-est">
+
+      <div class="intro">
+        <b>Metoda celor 3 cercuri.</b> Nu „vedem noi" — o estimare sinceră de la început. Completează numere, nu nume. Mireasă: câți din partea ta? Mire: câți din partea lui? <b>Localul și bugetul le alegi pe Cercul 1 + 2. Cercul 3 e bonus.</b>
+      </div>
+
+      <!-- CERCUL 1 -->
+      <div class="circle c1">
+        <div class="circle-head">
+          <div class="circle-num">1</div>
+          <div class="circle-info">
+            <h3>Fără ei nunta nu există</h3>
+            <p>Părinți, frați, nași, cei mai buni prieteni. Fix — nu se negociază.</p>
+          </div>
+          <div class="circle-total"><b id="c1-tot">0</b><span>persoane</span></div>
+        </div>
+        <div class="circle-body">
+          <div class="side"><div><label>Partea miresei</label><div class="side-sub">câți din partea ta</div></div><input type="number" id="c1-ea" placeholder="0" min="0"></div>
+          <div class="side"><div><label>Partea mirelui</label><div class="side-sub">câți din partea lui</div></div><input type="number" id="c1-el" placeholder="0" min="0"></div>
+        </div>
+      </div>
+
+      <!-- CERCUL 2 -->
+      <div class="circle c2">
+        <div class="circle-head">
+          <div class="circle-num">2</div>
+          <div class="circle-info">
+            <h3>Oamenii pe care chiar îi vreți</h3>
+            <p>Prieteni apropiați, colegi cu relație reală, verișori cu care vorbiți regulat.</p>
+          </div>
+          <div class="circle-total"><b id="c2-tot">0</b><span>persoane</span></div>
+        </div>
+        <div class="circle-body">
+          <div class="side"><div><label>Partea miresei</label><div class="side-sub">câți din partea ta</div></div><input type="number" id="c2-ea" placeholder="0" min="0"></div>
+          <div class="side"><div><label>Partea mirelui</label><div class="side-sub">câți din partea lui</div></div><input type="number" id="c2-el" placeholder="0" min="0"></div>
+        </div>
+      </div>
+
+      <!-- CERCUL 3 -->
+      <div class="circle c3">
+        <div class="circle-head">
+          <div class="circle-num">3</div>
+          <div class="circle-info">
+            <h3>Doar dacă bugetul și spațiul permit</h3>
+            <p>Vecini, cunoștințe, colegi „de serviciu", rude nevăzute de ani. Bonus.</p>
+          </div>
+          <div class="circle-total"><b id="c3-tot">0</b><span>persoane</span></div>
+        </div>
+        <div class="circle-body">
+          <div class="side"><div><label>Partea miresei</label><div class="side-sub">câți din partea ta</div></div><input type="number" id="c3-ea" placeholder="0" min="0"></div>
+          <div class="side"><div><label>Partea mirelui</label><div class="side-sub">câți din partea lui</div></div><input type="number" id="c3-el" placeholder="0" min="0"></div>
+        </div>
+      </div>
+
+      <!-- TOTALURI -->
+      <div class="est-totals">
+        <div class="et-card key">
+          <div class="et-lab">Cercul 1 + 2 — cifra ta de lucru</div>
+          <div class="et-val" id="est-key">0</div>
+          <div class="et-note">Pe asta alegi localul și construiești bugetul. Astea-s oamenii care chiar contează.</div>
+        </div>
+        <div class="et-card all">
+          <div class="et-lab">Total cu tot (1 + 2 + 3)</div>
+          <div class="et-val" id="est-all">0</div>
+          <div class="et-note">Maximul posibil, dacă inviți și tot Cercul 3.</div>
+        </div>
+      </div>
+
+      <!-- EXERCITIUL CERCUL 3 (cost) -->
+      <div class="c3-cost">
+        <b>Cât te costă Cercul 3?</b> Exercițiul din clip: câți invitați × cost per persoană = bani.
+        <div class="cost-row">
+          <span>Cost / persoană:</span>
+          <input type="number" id="c3-cpp" placeholder="0" min="0">
+          <select id="c3-cpp-cur"><option value="EUR">€</option><option value="RON">lei</option></select>
+          <span>× <b id="c3-count">0</b> pers. (Cercul 3) =</span>
+          <span class="cost-result" id="c3-cost-result">0</span>
+        </div>
+        <div style="margin-top:6px;font-size:12.5px;color:var(--muted)">Dacă cifra te sperie, e ok — mai bine acum decât peste 6 luni. Poți reduce Cercul 3 și vezi instant economia.</div>
+      </div>
+
+    </div>
+
+    <!-- ════════ TAB 2: LISTA NOMINALA ════════ -->
+    <div class="panel" id="panel-list">
+
+      <div class="status-summary">
+        <div class="ss total"><div class="ss-n" id="ls-total">0</div><div class="ss-l">Total în listă</div></div>
+        <div class="ss conf"><div class="ss-n" id="ls-conf">0</div><div class="ss-l">Confirmați</div></div>
+        <div class="ss pos"><div class="ss-n" id="ls-pos">0</div><div class="ss-l">Posibil</div></div>
+        <div class="ss nec"><div class="ss-n" id="ls-nec">0</div><div class="ss-l">Necontactați</div></div>
+      </div>
+
+      <div class="intro">
+        💡 Adaugi invitații pe nume, fiecare cu cercul din care face parte și statusul. <b>Cifrele de sus și din panoul tău se actualizează singure.</b> Poți adăuga și „+1" ca invitat separat.
+      </div>
+
+      <div class="list-card">
+        <div class="list-head"><div>Nume invitat</div><div>Cerc</div><div>Status</div><div></div></div>
+        <div id="guests-rows"></div>
+        <button class="add-guest" id="add-guest">＋ adaugă invitat</button>
+      </div>
+
+    </div>
+
+    <!-- ACTIUNI -->
+    <div class="actions">
+      <span class="save-status" id="wd-save-status">✓ Salvat</span>
+      <button class="btn-save" id="wd-save-btn">💾 Salvează invitații</button>
+    </div>
+
+    <!-- NAVIGARE JOS -->
+    <!-- [DEV] Înlocuiește {{link_*}}. Pagina curentă (Tracker invitați) nu se mai pune. -->
+    <div class="nav-tools">
+      <div class="nav-tools-label">Mergi mai departe la:</div>
+      <div class="nav-tools-grid">
+        <a class="nt-card" data-nav="buget" href="#"><span class="nt-ic ic-gold">💰</span> Tracker buget</a>
+        <a class="nt-card" data-nav="comparator" href="#"><span class="nt-ic ic-blue">⚖️</span> Comparator furnizori</a>
+        <a class="nt-card" data-nav="creator" href="#"><span class="nt-ic ic-sage">💌</span> Creează invitația</a>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <a class="btn-back" data-nav="buget" href="#">💰 Tracker buget</a>
+      <a class="btn-back" data-nav="panou" href="#">⌂ Înapoi la panou</a>
+      <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator</a>
+      <a class="btn-back" data-nav="creator" href="#">💌 Creează invitația</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  function n(v){ v=parseFloat(v); return isNaN(v)?0:v; }
+  function fmt(x){ return Math.round(x).toLocaleString('ro-RO'); }
+
+  // ════════ DATE ════════
+  // [DEV] valori inițiale dacă nu există date salvate
+  // ======== CONFIG VAL.TOWN (conectare salvare per cont) ========
+  var WD_API = "https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
+  function wdGetCid(){
+    try{
+      var k = Object.keys(localStorage).filter(function(x){return x.indexOf("firebase:authUser")>-1;})[0];
+      if(k){
+        var d = JSON.parse(localStorage.getItem(k));
+        var p = JSON.parse(atob(d.stsTokenManager.accessToken.split(".")[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if(p.contact_id) return p.contact_id;
+      }
+    }catch(e){}
+    var u = new URL(window.location.href);
+    return u.searchParams.get("cid");
+  }
+  var WD_CID = wdGetCid();
+
+  // ── leg butoanele de navigare catre celelalte instrumente ──
+  (function wdBindNav(){
+    var LB="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
+    var Q=WD_CID?("?cid="+encodeURIComponent(WD_CID)):"";
+    var IDS={panou:"91ca406c-00bf-4a4c-ab24-f47971007e1c",buget:"48ea5cab-c32f-4ccb-a6c3-ba959f723785",comparator:"c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f",creator:"6cbbe44b-cf37-4ed6-90c4-faa054da52d3"};
+    document.querySelectorAll('[data-nav]').forEach(function(a){ var id=IDS[a.getAttribute('data-nav')]; if(id) a.href=LB+id+Q; });
+  })();
+
+  var DEFAULT_DATA = {
+    est: { c1:{ea:0,el:0}, c2:{ea:0,el:0}, c3:{ea:0,el:0}, cpp:0, cppCur:'EUR' },
+    guests: [] // { name, circle:1|2|3, status:'conf'|'pos'|'nec' }
+  };
+  var DATA = null;
+
+  // ════════ TAB SWITCH ════════
+  document.querySelectorAll('#wd-inv .tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('#wd-inv .tab').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('#wd-inv .panel').forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      $('panel-'+t.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ════════ TAB 1: ESTIMARE ════════
+  var estInputs = ['c1-ea','c1-el','c2-ea','c2-el','c3-ea','c3-el'];
+  estInputs.forEach(function(id){
+    $(id).addEventListener('input', function(){ readEst(); recomputeEst(); });
+  });
+  $('c3-cpp').addEventListener('input', function(){ DATA.est.cpp=n(this.value); recomputeEst(); });
+  $('c3-cpp-cur').addEventListener('change', function(){ DATA.est.cppCur=this.value; recomputeEst(); });
+
+  function readEst(){
+    DATA.est.c1={ea:n($('c1-ea').value), el:n($('c1-el').value)};
+    DATA.est.c2={ea:n($('c2-ea').value), el:n($('c2-el').value)};
+    DATA.est.c3={ea:n($('c3-ea').value), el:n($('c3-el').value)};
+  }
+  function recomputeEst(){
+    var c1 = DATA.est.c1.ea + DATA.est.c1.el;
+    var c2 = DATA.est.c2.ea + DATA.est.c2.el;
+    var c3 = DATA.est.c3.ea + DATA.est.c3.el;
+    $('c1-tot').textContent=c1; $('c2-tot').textContent=c2; $('c3-tot').textContent=c3;
+    $('est-key').textContent = c1+c2;
+    $('est-all').textContent = c1+c2+c3;
+    // cost cercul 3
+    $('c3-count').textContent = c3;
+    var cost = c3 * n(DATA.est.cpp);
+    $('c3-cost-result').textContent = fmt(cost)+' '+(DATA.est.cppCur==='EUR'?'€':'lei');
+  }
+
+  // ════════ TAB 2: LISTA ════════
+  var CIRCLE_LABELS = {1:'Cercul 1', 2:'Cercul 2', 3:'Cercul 3'};
+  var STATUS_LABELS = {conf:'Confirmat', pos:'Posibil', nec:'Necontactat'};
+
+  function renderGuests(){
+    var host=$('guests-rows'); host.innerHTML='';
+    if(DATA.guests.length===0){
+      host.innerHTML='<div class="list-empty">Încă niciun invitat adăugat. Apasă „adaugă invitat" când ești gata să treci de la numere la nume.</div>';
+      recomputeList(); return;
+    }
+    DATA.guests.forEach(function(g, i){
+      var row=document.createElement('div'); row.className='grow';
+
+      var name=document.createElement('input'); name.className='g-name'; name.value=g.name||''; name.placeholder='Nume invitat';
+      name.addEventListener('input', function(){ g.name=name.value; });
+
+      var circle=document.createElement('select');
+      circle.innerHTML='<option value="1">Cercul 1</option><option value="2">Cercul 2</option><option value="3">Cercul 3</option>';
+      circle.value=g.circle||1;
+      circle.addEventListener('change', function(){ g.circle=parseInt(circle.value); });
+
+      var status=document.createElement('select');
+      status.innerHTML='<option value="conf">Confirmat</option><option value="pos">Posibil</option><option value="nec">Necontactat</option>';
+      status.value=g.status||'nec';
+      status.className='st-'+(g.status||'nec');
+      status.addEventListener('change', function(){ g.status=status.value; status.className='st-'+status.value; recomputeList(); });
+
+      var del=document.createElement('button'); del.className='g-del'; del.innerHTML='✕'; del.title='Șterge';
+      del.addEventListener('click', function(){ DATA.guests.splice(i,1); renderGuests(); });
+
+      row.appendChild(name); row.appendChild(circle); row.appendChild(status); row.appendChild(del);
+      host.appendChild(row);
+    });
+    recomputeList();
+  }
+
+  function recomputeList(){
+    var total=DATA.guests.length, conf=0,pos=0,nec=0;
+    DATA.guests.forEach(function(g){
+      if(g.status==='conf')conf++; else if(g.status==='pos')pos++; else nec++;
+    });
+    $('ls-total').textContent=total; $('ls-conf').textContent=conf; $('ls-pos').textContent=pos; $('ls-nec').textContent=nec;
+  }
+
+  $('add-guest').addEventListener('click', function(){
+    DATA.guests.push({name:'', circle:1, status:'nec'});
+    renderGuests();
+  });
+
+  // ════════════════════════════════════════════════════════════════
+  // [DEV] EXPORT ÎN FIȘĂ (panoul personal) — totaluri invitați.
+  // Trimiteți obiectul ăsta în custom fields → apar în panou automat.
+  // ════════════════════════════════════════════════════════════════
+  function wdExportInvitati(){
+    var total=DATA.guests.length, conf=0,pos=0,nec=0;
+    DATA.guests.forEach(function(g){ if(g.status==='conf')conf++; else if(g.status==='pos')pos++; else nec++; });
+    var c1=DATA.est.c1.ea+DATA.est.c1.el, c2=DATA.est.c2.ea+DATA.est.c2.el, c3=DATA.est.c3.ea+DATA.est.c3.el;
+    return {
+      invitati_total_estimat: (c1+c2+c3),       // total estimat (3 cercuri) — merge în panou ca "total"
+      invitati_cerc12: (c1+c2),                  // cifra de lucru
+      invitati_in_lista: total,                  // câți au fost trecuți pe nume
+      invitati_confirmati: conf,                 // → panou
+      invitati_posibil: pos,                     // → panou
+      invitati_necontactati: nec                 // → panou
+    };
+  }
+  window.wdExportInvitati = wdExportInvitati;
+
+  // ════════════════════════════════════════════════════════════════
+  // [DEV] SALVARE — la fel ca la tracker buget (vezi fișa de salvare).
+  // ════════════════════════════════════════════════════════════════
+  function wdSave(){
+    if(!WD_CID){ alert("Nu te-am putut identifica. Reincarca pagina."); return; }
+    var payload = JSON.stringify(DATA);
+    var ex = wdExportInvitati();
+    var s=$('wd-save-status'); s.textContent="Se salveaza..."; s.classList.add('show');
+    fetch(WD_API + "?cid=" + encodeURIComponent(WD_CID), {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        invitatiJson: payload,
+        invitatiTotal: ex.invitati_in_lista>0 ? ex.invitati_in_lista : ex.invitati_total_estimat,
+        invitatiConfirmati: ex.invitati_confirmati,
+        invitatiPosibil: ex.invitati_posibil,
+        invitatiNecontactati: ex.invitati_necontactati
+      })
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      s.textContent = d.ok ? "Salvat!" : "Eroare la salvare";
+      setTimeout(function(){ s.classList.remove('show'); s.textContent=""; },2200);
+    })
+    .catch(function(){ s.textContent="Eroare retea"; setTimeout(function(){s.classList.remove('show');s.textContent="";},2200); });
+  }
+  $('wd-save-btn').addEventListener('click', wdSave);
+
+  // ════════ LOAD ════════
+  // [DEV] Dacă aveți date salvate, puneți-le în window.WD_SAVED_INV înaintea acestui script.
+  function wdApplyData(){
+    $('c1-ea').value=DATA.est.c1.ea||''; $('c1-el').value=DATA.est.c1.el||'';
+    $('c2-ea').value=DATA.est.c2.ea||''; $('c2-el').value=DATA.est.c2.el||'';
+    $('c3-ea').value=DATA.est.c3.ea||''; $('c3-el').value=DATA.est.c3.el||'';
+    $('c3-cpp').value=DATA.est.cpp||''; $('c3-cpp-cur').value=DATA.est.cppCur||'EUR';
+    recomputeEst();
+    renderGuests();
+  }
+  function wdLoad(){
+    DATA=JSON.parse(JSON.stringify(DEFAULT_DATA));
+    wdApplyData();
+    if(!WD_CID) return;
+    fetch(WD_API + "?cid=" + encodeURIComponent(WD_CID))
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d && d.ok && d.invitatiJson){
+          try{
+            var saved=JSON.parse(d.invitatiJson);
+            if(saved && saved.est){ DATA=saved; wdApplyData(); }
+          }catch(e){}
+        }
+      })
+      .catch(function(){});
+  }
+  wdLoad();
+})();
+</script>
+
+</body>
+</html>

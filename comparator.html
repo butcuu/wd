@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Wedding Direction — Comparator furnizori</title>
+<style>
+/* ════════════════════════════════════════════════════════════════
+   COMPARATOR FURNIZORI — WEDDING DIRECTION
+   Conectat la val.town (camp: comparator_json / FkMgAJ2HJHiyc7wgF55n)
+   ════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+#wd-comparator *{margin:0;padding:0;box-sizing:border-box}
+#wd-comparator{
+  --gold:#b7934f; --gold-dark:#9b7938; --gold-soft:#f6eedf;
+  --rose:#c98d7c; --rose-soft:#fbefeb;
+  --sage:#7f9f73; --sage-soft:#eef5eb;
+  --blue:#7392b3; --blue-soft:#edf3f9;
+  --ink:#2b2622; --text:#4f463f; --paper:#fcf8f3;
+  --line:#e9e0d2;
+  font-family:'Inter',sans-serif;
+  color:var(--text);
+  background:var(--paper);
+  min-height:100vh;
+  padding:24px 16px 80px;
+  line-height:1.6;
+}
+#wd-comparator .serif{font-family:'Cormorant Garamond',serif}
+
+/* TOPBAR */
+#wd-comparator .topbar{height:5px;background:linear-gradient(90deg,var(--gold),var(--rose),var(--gold));border-radius:5px;max-width:1000px;margin:0 auto 22px}
+
+/* HEADER */
+#wd-comparator .wd-head{max-width:1000px;margin:0 auto 8px;text-align:center}
+#wd-comparator .brand{font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dark);font-weight:600}
+#wd-comparator .brand small{display:block;font-size:11px;letter-spacing:2px;color:var(--rose);margin-top:2px;font-weight:500}
+#wd-comparator .pill{display:inline-block;margin-top:14px;background:var(--gold-soft);color:var(--gold-dark);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:6px 16px;border-radius:20px}
+
+#wd-comparator h1{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--ink);text-align:center;margin:16px auto 6px;max-width:1000px;line-height:1.1}
+#wd-comparator .sub{text-align:center;max-width:600px;margin:0 auto 30px;font-size:15px;color:var(--text)}
+
+/* CATEGORII TABS */
+#wd-comparator .cats{max-width:1000px;margin:0 auto 24px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#wd-comparator .cat-tab{background:#fff;border:1.5px solid var(--line);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 16px;border-radius:22px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+#wd-comparator .cat-tab:hover{border-color:var(--gold)}
+#wd-comparator .cat-tab.active{background:var(--gold);border-color:var(--gold);color:#fff}
+#wd-comparator .cat-tab .x{opacity:.6;font-weight:400;margin-left:2px}
+#wd-comparator .cat-tab .x:hover{opacity:1}
+#wd-comparator .cat-add{background:var(--gold-soft);border:1.5px dashed var(--gold);color:var(--gold-dark);font-weight:600;padding:9px 16px;border-radius:22px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif}
+#wd-comparator .cat-add:hover{background:#fff}
+
+/* INTRO BOX cand nu e nimic */
+#wd-comparator .intro{max-width:640px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:40px 28px;text-align:center}
+#wd-comparator .intro .ic{font-size:42px;margin-bottom:14px}
+#wd-comparator .intro h2{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--ink);margin-bottom:10px;font-weight:600}
+#wd-comparator .intro p{font-size:15px;margin-bottom:22px}
+
+/* TABEL COMPARATIE */
+#wd-comparator .board{max-width:1000px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+#wd-comparator .board-head{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#wd-comparator .board-head .t{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:8px}
+#wd-comparator .scroll{overflow-x:auto}
+#wd-comparator table{width:100%;border-collapse:collapse;min-width:520px}
+#wd-comparator th,#wd-comparator td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+#wd-comparator th.crit{width:200px;color:var(--text);font-weight:600;background:var(--paper);font-size:13px}
+#wd-comparator thead th{background:var(--gold-soft);color:var(--gold-dark);font-weight:600;font-size:13px}
+#wd-comparator thead th.crit{background:var(--gold-soft)}
+
+/* coloana furnizor header */
+#wd-comparator .prov-head{position:relative}
+#wd-comparator .prov-head input{width:100%;border:none;background:transparent;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;color:var(--gold-dark);text-align:center;padding:2px}
+#wd-comparator .prov-head input:focus{outline:none;background:#fff;border-radius:6px}
+#wd-comparator .prov-del{position:absolute;top:-6px;right:2px;background:none;border:none;color:var(--rose);cursor:pointer;font-size:14px;opacity:.5;line-height:1}
+#wd-comparator .prov-del:hover{opacity:1}
+#wd-comparator .winner{background:var(--sage-soft)!important}
+#wd-comparator .winner-badge{display:inline-block;background:var(--sage);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:10px;text-transform:uppercase;margin-top:4px}
+
+/* stele */
+#wd-comparator .stars{display:flex;gap:3px;justify-content:center}
+#wd-comparator .star{cursor:pointer;font-size:18px;color:var(--line);transition:color .1s;user-select:none}
+#wd-comparator .star.on{color:var(--gold)}
+#wd-comparator .star:hover{color:var(--gold-dark)}
+
+/* pret input */
+#wd-comparator .price-in{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:'Inter',sans-serif;font-size:14px;text-align:center;color:var(--ink)}
+#wd-comparator .price-in:focus{outline:none;border-color:var(--gold)}
+
+/* scor */
+#wd-comparator .score-row td{background:var(--paper);font-weight:700}
+#wd-comparator .score-val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--ink);text-align:center;display:block;line-height:1}
+#wd-comparator .score-bar{height:6px;background:var(--line);border-radius:4px;margin-top:6px;overflow:hidden}
+#wd-comparator .score-bar i{display:block;height:100%;background:var(--gold);border-radius:4px}
+#wd-comparator .winner .score-bar i{background:var(--sage)}
+
+/* add provider btn */
+#wd-comparator .add-prov{margin:18px 24px;display:flex;gap:10px;flex-wrap:wrap}
+#wd-comparator .btn{font-family:'Inter',sans-serif;font-weight:600;font-size:14px;padding:11px 22px;border-radius:24px;cursor:pointer;border:none;transition:all .15s}
+#wd-comparator .btn-gold{background:var(--gold);color:#fff}
+#wd-comparator .btn-gold:hover{background:var(--gold-dark)}
+#wd-comparator .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--text)}
+#wd-comparator .btn-ghost:hover{border-color:var(--gold)}
+
+/* verdict box */
+#wd-comparator .verdict{max-width:1000px;margin:20px auto 0;background:var(--sage-soft);border:1px solid #cfe0c8;border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:14px}
+#wd-comparator .verdict .ic{font-size:32px}
+#wd-comparator .verdict .vt{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ink);font-weight:600}
+#wd-comparator .verdict .vs{font-size:13px;color:var(--text)}
+#wd-comparator .verdict b{color:var(--sage)}
+
+/* SAVE BAR */
+#wd-comparator .savebar{position:fixed;bottom:0;left:0;right:0;background:rgba(252,248,243,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:14px;z-index:50}
+#wd-comparator .save-status{font-size:13px;color:var(--text)}
+#wd-comparator .btn-save{background:var(--gold);color:#fff;font-weight:600;padding:11px 28px;border-radius:24px;border:none;cursor:pointer;font-size:14px;font-family:'Inter',sans-serif}
+#wd-comparator .btn-save:hover{background:var(--gold-dark)}
+#wd-comparator .btn-save:disabled{opacity:.5;cursor:default}
+
+/* NAV jos */
+#wd-comparator .nav{max-width:1000px;margin:30px auto 0;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+#wd-comparator .nav a{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);color:var(--text);text-decoration:none;font-weight:600;font-size:13px;padding:10px 18px;border-radius:22px;transition:all .15s}
+#wd-comparator .nav a:hover{border-color:var(--gold);color:var(--gold-dark)}
+#wd-comparator .nav a.home{background:var(--gold-soft);border-color:var(--gold);color:var(--gold-dark)}
+
+/* loading / error */
+#wd-comparator .state{max-width:560px;margin:40px auto;text-align:center;padding:30px;background:#fff;border:1px solid var(--line);border-radius:16px}
+#wd-comparator .state .ic{font-size:36px;margin-bottom:12px}
+#wd-comparator .state h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ink);margin-bottom:8px}
+
+@media(max-width:640px){
+  #wd-comparator h1{font-size:30px}
+  #wd-comparator th.crit{width:130px;font-size:12px}
+  #wd-comparator .score-val{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div id="wd-comparator">
+
+  <div class="topbar"></div>
+
+  <div class="wd-head">
+    <div class="brand">Wedding Direction<small>by Oana</small></div>
+    <div class="pill">Comparator furnizori</div>
+  </div>
+
+  <h1 class="serif">Alege pe valoare, nu doar pe preț</h1>
+  <p class="sub">Pune furnizorii față în față, dă-le note la ce contează cu adevărat, și lasă comparatorul să-ți arate clar care iese cel mai bine.</p>
+
+  <!-- aici se randeaza tot -->
+  <div id="wd-root">
+    <div class="state"><div class="ic">⏳</div><h2 class="serif">Se încarcă...</h2><p>Îți aduc comparațiile salvate.</p></div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" id="wd-nav" style="display:none">
+    <a href="#" class="home" data-nav="panou">⌂ Înapoi la panou</a>
+    <a href="#" data-nav="buget">💰 Tracker buget</a>
+    <a href="#" data-nav="invitati">👥 Tracker invitați</a>
+    <a href="#" data-nav="creator">💌 Creează invitația</a>
+  </div>
+
+  <!-- SAVE BAR -->
+  <div class="savebar" id="wd-savebar" style="display:none">
+    <span class="save-status" id="wd-status"></span>
+    <button class="btn-save" id="wd-save">💾 Salvează comparațiile</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ─── CONFIG val.town ───
+  var WD_API = "https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
+
+  // ─── CRITERII ───
+  var CRIT = [
+    {key:"pret",  label:"Preț (cât de avantajos)"},
+    {key:"calit", label:"Calitate / Portofoliu"},
+    {key:"feel",  label:"Feeling / Comunicare"},
+    {key:"disp",  label:"Disponibilitate"}
+  ];
+
+  // categorii predefinite ca sugestii la adaugare
+  var CAT_PRESETS = ["📸 Fotograf","🎥 Videograf","🏛️ Local","🎵 Formație / DJ","🎂 Tort","💐 Decor & flori","👗 Rochie","💄 Beauty","✉️ Invitații","🚗 Transport"];
+
+  // ─── STARE ───
+  // DATA = { cats: [ {id, name, providers:[ {name, scores:{pret,calit,feel,disp}, price} ]} ] }
+  var DATA = { cats: [] };
+  var activeCat = 0;
+  var dirty = false;
+
+  // ─── CID ───
+  function getCid(){
+    // 1. din URL (?cid=)
+    try{
+      var p = new URLSearchParams(window.location.search);
+      if(p.get("cid")) return p.get("cid");
+    }catch(e){}
+    // 2. din token Firebase (in portal)
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i);
+        if(k && k.indexOf("firebase:authUser")>-1){
+          var d = JSON.parse(localStorage.getItem(k));
+          if(d && d.stsTokenManager && d.stsTokenManager.accessToken){
+            var pl = JSON.parse(atob(d.stsTokenManager.accessToken.split(".")[1].replace(/-/g,'+').replace(/_/g,'/')));
+            if(pl.contact_id) return pl.contact_id;
+          }
+        }
+      }
+    }catch(e){}
+    return null;
+  }
+  var CID = getCid();
+
+  // ─── HELPERS ───
+  function uid(){ return "c"+Math.random().toString(36).slice(2,8); }
+  function el(id){ return document.getElementById(id); }
+
+  function newProvider(name){
+    return { name: name||"Furnizor", scores:{pret:0,calit:0,feel:0,disp:0}, price:"" };
+  }
+  function newCat(name){
+    return { id:uid(), name:name||"Categorie nouă", providers:[ newProvider("Furnizor 1"), newProvider("Furnizor 2") ] };
+  }
+
+  // categoriile standard de nuntă (pre-completate la prima deschidere)
+  var STANDARD_CATS = [
+    "📸 Fotograf",
+    "🎥 Videograf",
+    "🏛️ Local & meniu",
+    "🎵 Formație / DJ",
+    "🎂 Tort & candy bar",
+    "💐 Decor & flori",
+    "👗 Rochie & costum",
+    "💄 Beauty (machiaj/coafură)"
+  ];
+  function defaultCats(){
+    return STANDARD_CATS.map(function(n){ return newCat(n); });
+  }
+
+  function scoreOf(p){
+    var s=0; CRIT.forEach(function(c){ s += (p.scores[c.key]||0); });
+    return s; // max 20
+  }
+
+  // ─── LOAD din val.town ───
+  function load(){
+    if(!CID){
+      el("wd-root").innerHTML = '<div class="state"><div class="ic">🔒</div><h2 class="serif">Nu te-am putut identifica</h2><p>Deschide pagina din contul tău (din panou), nu direct.</p></div>';
+      return;
+    }
+    fetch(WD_API + "?cid=" + encodeURIComponent(CID))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(j && j.ok){
+          // incarc comparatorJson daca exista
+          var raw = j.comparatorJson;
+          if(raw && typeof raw === "string" && raw.charAt(0) === "{"){
+            try{ var parsed = JSON.parse(raw); if(parsed && parsed.cats && parsed.cats.length) DATA = parsed; }catch(e){}
+          }
+        }
+        // daca nu are nimic salvat, pornim cu categoriile standard
+        if(!DATA.cats || !DATA.cats.length){ DATA = { cats: defaultCats() }; }
+        render();
+      })
+      .catch(function(){
+        // chiar daca pica citirea, pornim cu categoriile standard
+        if(!DATA.cats || !DATA.cats.length){ DATA = { cats: defaultCats() }; }
+        render();
+      });
+  }
+
+  // ─── SAVE in val.town ───
+  function save(){
+    if(!CID){ alert("Nu te pot identifica — deschide din panou."); return; }
+    var btn = el("wd-save");
+    btn.disabled = true;
+    el("wd-status").textContent = "Se salvează...";
+    fetch(WD_API + "?cid=" + encodeURIComponent(CID), {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ comparatorJson: JSON.stringify(DATA) })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      btn.disabled = false;
+      if(j && (j.ok || j.salvat)){
+        el("wd-status").textContent = "✓ Salvat!";
+        dirty = false;
+        setTimeout(function(){ el("wd-status").textContent=""; }, 2500);
+      } else {
+        el("wd-status").textContent = "✕ Nu s-a salvat. Mai încearcă.";
+      }
+    })
+    .catch(function(){
+      btn.disabled = false;
+      el("wd-status").textContent = "✕ Eroare. Mai încearcă.";
+    });
+  }
+
+  function markDirty(){ dirty = true; }
+
+  // ─── RENDER ───
+  function render(){
+    el("wd-nav").style.display = "flex";
+    el("wd-savebar").style.display = "flex";
+
+    if(!DATA.cats.length){
+      el("wd-root").innerHTML =
+        '<div class="intro">'+
+          '<div class="ic">⚖️</div>'+
+          '<h2 class="serif">Ai șters toate categoriile</h2>'+
+          '<p>Poți readuce categoriile standard de nuntă, sau adăuga una proprie.</p>'+
+          '<button class="btn btn-gold" id="wd-restorecats">＋ Readu categoriile standard</button> '+
+          '<button class="btn btn-ghost" id="wd-firstcat">＋ Categorie proprie</button>'+
+        '</div>';
+      el("wd-firstcat").onclick = pickCat;
+      el("wd-restorecats").onclick = function(){ DATA.cats = defaultCats(); activeCat=0; markDirty(); render(); };
+      return;
+    }
+
+    if(activeCat >= DATA.cats.length) activeCat = 0;
+    var cat = DATA.cats[activeCat];
+
+    // tabs categorii
+    var tabs = '<div class="cats">';
+    DATA.cats.forEach(function(c,i){
+      tabs += '<button class="cat-tab '+(i===activeCat?'active':'')+'" data-cat="'+i+'">'+
+                esc(c.name)+'<span class="x" data-delcat="'+i+'">✕</span></button>';
+    });
+    tabs += '<button class="cat-add" id="wd-addcat">＋ Categorie</button></div>';
+
+    // gaseste winner
+    var maxScore=-1, winnerIdx=-1;
+    cat.providers.forEach(function(p,i){ var s=scoreOf(p); if(s>maxScore){maxScore=s;winnerIdx=i;} });
+    if(maxScore<=0) winnerIdx=-1;
+
+    // tabel
+    var t = '<div class="board"><div class="board-head"><span class="t">'+esc(cat.name)+'</span></div><div class="scroll"><table><thead><tr><th class="crit">Criteriu</th>';
+    cat.providers.forEach(function(p,i){
+      t += '<th class="prov-head'+(i===winnerIdx?' winner':'')+'">'+
+             (cat.providers.length>2?'<button class="prov-del" data-delprov="'+i+'">✕</button>':'')+
+             '<input value="'+esc(p.name)+'" data-prov="'+i+'" placeholder="Nume furnizor"/>'+
+             (i===winnerIdx?'<div style="text-align:center"><span class="winner-badge">Recomandat</span></div>':'')+
+           '</th>';
+    });
+    t += '</tr></thead><tbody>';
+
+    // randuri criterii
+    CRIT.forEach(function(c){
+      t += '<tr><th class="crit">'+c.label+'</th>';
+      cat.providers.forEach(function(p,i){
+        t += '<td'+(i===winnerIdx?' class="winner"':'')+'><div class="stars" data-prov="'+i+'" data-crit="'+c.key+'">';
+        for(var s=1;s<=5;s++){
+          t += '<span class="star'+(s<=(p.scores[c.key]||0)?' on':'')+'" data-val="'+s+'">★</span>';
+        }
+        t += '</div></td>';
+      });
+      t += '</tr>';
+    });
+
+    // rand pret
+    t += '<tr><th class="crit">Preț (lei / €)</th>';
+    cat.providers.forEach(function(p,i){
+      t += '<td'+(i===winnerIdx?' class="winner"':'')+'><input class="price-in" value="'+esc(p.price||"")+'" data-price="'+i+'" placeholder="ex. 8000"/></td>';
+    });
+    t += '</tr>';
+
+    // rand scor
+    t += '<tr class="score-row"><th class="crit">Scor total</th>';
+    cat.providers.forEach(function(p,i){
+      var sc=scoreOf(p), pct=Math.round(sc/20*100);
+      t += '<td'+(i===winnerIdx?' class="winner"':'')+'><span class="score-val">'+sc+'<span style="font-size:14px;color:#9b8a78">/20</span></span><div class="score-bar"><i style="width:'+pct+'%"></i></div></td>';
+    });
+    t += '</tr>';
+
+    t += '</tbody></table></div>';
+    // add provider
+    t += '<div class="add-prov"><button class="btn btn-ghost" id="wd-addprov">＋ Adaugă furnizor</button></div></div>';
+
+    // verdict
+    var verdict = '';
+    if(winnerIdx>=0){
+      var w = cat.providers[winnerIdx];
+      verdict = '<div class="verdict"><div class="ic">🏆</div><div><div class="vt">Pe ansamblu, iese cel mai bine: <b>'+esc(w.name)+'</b></div>'+
+                '<div class="vs">Scor '+scoreOf(w)+'/20'+(w.price?' · preț '+esc(w.price):'')+'. Dar tu decizi — uneori feeling-ul bate cifrele.</div></div></div>';
+    }
+
+    el("wd-root").innerHTML = tabs + t + verdict;
+    bind();
+  }
+
+  function esc(s){ return String(s==null?"":s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ─── EVENIMENTE ───
+  function bind(){
+    var root = el("wd-root");
+
+    // tab categorie
+    root.querySelectorAll('.cat-tab').forEach(function(b){
+      b.onclick = function(e){
+        if(e.target.dataset.delcat!=null) return;
+        activeCat = +b.dataset.cat; render();
+      };
+    });
+    // sterge categorie
+    root.querySelectorAll('[data-delcat]').forEach(function(x){
+      x.onclick = function(e){
+        e.stopPropagation();
+        var i = +x.dataset.delcat;
+        if(confirm('Ștergi categoria "'+DATA.cats[i].name+'"?')){
+          DATA.cats.splice(i,1); if(activeCat>=DATA.cats.length)activeCat=Math.max(0,DATA.cats.length-1);
+          markDirty(); render();
+        }
+      };
+    });
+    // adauga categorie
+    var ac = el("wd-addcat"); if(ac) ac.onclick = pickCat;
+
+    // nume furnizor
+    root.querySelectorAll('input[data-prov]').forEach(function(inp){
+      inp.oninput = function(){ DATA.cats[activeCat].providers[+inp.dataset.prov].name = inp.value; markDirty(); };
+      inp.onblur = function(){ render(); };
+    });
+    // sterge furnizor
+    root.querySelectorAll('[data-delprov]').forEach(function(b){
+      b.onclick = function(){
+        var i=+b.dataset.delprov; DATA.cats[activeCat].providers.splice(i,1); markDirty(); render();
+      };
+    });
+    // stele
+    root.querySelectorAll('.stars').forEach(function(box){
+      box.querySelectorAll('.star').forEach(function(st){
+        st.onclick = function(){
+          var pi=+box.dataset.prov, ck=box.dataset.crit, v=+st.dataset.val;
+          var cur = DATA.cats[activeCat].providers[pi].scores[ck];
+          DATA.cats[activeCat].providers[pi].scores[ck] = (cur===v?0:v); // click pe aceeasi stea = reset
+          markDirty(); render();
+        };
+      });
+    });
+    // pret
+    root.querySelectorAll('input[data-price]').forEach(function(inp){
+      inp.oninput = function(){ DATA.cats[activeCat].providers[+inp.dataset.price].price = inp.value; markDirty(); };
+    });
+    // adauga furnizor
+    var ap = el("wd-addprov");
+    if(ap) ap.onclick = function(){
+      if(DATA.cats[activeCat].providers.length>=5){ alert("Maxim 5 furnizori per categorie — ca să rămână clar."); return; }
+      DATA.cats[activeCat].providers.push(newProvider("Furnizor "+(DATA.cats[activeCat].providers.length+1)));
+      markDirty(); render();
+    };
+  }
+
+  function pickCat(){
+    var name = prompt("Ce vrei să compari?\n(ex: Fotograf, Local, Formație, Tort...)", "");
+    if(name===null) return;
+    name = name.trim(); if(!name) name = "Categorie";
+    // adauga emoji daca se potriveste cu un preset
+    var match = CAT_PRESETS.find(function(p){ return p.toLowerCase().indexOf(name.toLowerCase())>-1; });
+    DATA.cats.push(newCat(match||name));
+    activeCat = DATA.cats.length-1;
+    markDirty(); render();
+  }
+
+  // ─── NAV (linkuri spre alte instrumente) ───
+  // In portal, inlocuieste cu URL-urile lecțiilor. Lasate # pana se completeaza.
+  var _LB = "https://vsu1yqyciwfpxmbuclmi.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
+  var _Q = CID ? ("?cid="+encodeURIComponent(CID)) : "";
+  var NAV_LINKS = {
+    panou:    _LB+"91ca406c-00bf-4a4c-ab24-f47971007e1c"+_Q,
+    buget:    _LB+"48ea5cab-c32f-4ccb-a6c3-ba959f723785"+_Q,
+    invitati: _LB+"46f55aa5-48b0-4022-8161-5be7d1c9be34"+_Q,
+    creator:  _LB+"6cbbe44b-cf37-4ed6-90c4-faa054da52d3"+_Q
+  };
+  document.querySelectorAll('[data-nav]').forEach(function(a){
+    var dest = NAV_LINKS[a.dataset.nav];
+    if(dest && dest!=="#") a.href = dest;
+    else a.onclick = function(e){ e.preventDefault(); };
+  });
+
+  // ─── INIT ───
+  el("wd-save").onclick = save;
+  window.addEventListener("beforeunload", function(e){
+    if(dirty){ e.preventDefault(); e.returnValue=""; }
+  });
+  load();
+
+})();
+</script>
+</body>
+</html>
