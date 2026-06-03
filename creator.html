@@ -243,6 +243,7 @@
           <input type="text" id="share-link" readonly value="">
           <button class="btn btn-ghost" id="btn-copy">Copiază</button>
         </div>
+        <div id="link-updated" style="font-size:12px;font-weight:600;color:#7f9f73;margin-top:6px;opacity:0;transition:opacity .3s;height:16px"></div>
         <div class="btn-row">
           <a class="btn btn-wa" id="btn-wa" target="_blank">Trimite pe WhatsApp</a>
           <button class="btn btn-gold" id="btn-save">Salvează invitația</button>
@@ -592,6 +593,9 @@
     document.getElementById('chosen-name').textContent=TPL_NAMES[current];
     var waMsg=encodeURIComponent('Vă invităm la nunta noastră! 💛 Detaliile și confirmarea aici:\n'+buildShareLink());
     document.getElementById('btn-wa').href='https://wa.me/?text='+waMsg;
+    // feedback vizual: linkul s-a actualizat pentru modelul ales
+    var fb=document.getElementById('link-updated');
+    if(fb){ fb.textContent='✓ Link actualizat pentru modelul '+TPL_NAMES[current]; fb.style.opacity='1'; clearTimeout(window.__wdFb); window.__wdFb=setTimeout(function(){ fb.style.opacity='0'; },2200); }
   }
 
   // ═══ CITIRE FORMULAR ═══
