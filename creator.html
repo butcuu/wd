@@ -263,7 +263,7 @@
       <a class="btn-back" data-nav="buget" href="#">💰 Tracker buget</a>
       <a class="btn-back" data-nav="invitati" href="#">👥 Tracker invitați</a>
       <a class="btn-back" data-nav="comparator" href="#">⚖️ Comparator</a>
-      <a class="btn-back" data-nav="curs" href="#">← Înapoi la curs</a>
+      <a class="btn-back" href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net" target="_top">← Înapoi la video</a>
     </div>
 
   </div>
@@ -575,12 +575,15 @@
   // Funcțional ACUM: codează toate datele în URL (#...). Invitația se
   // deschide pe pagina-vizualizator (vezi [DEV]). Fără platformă.
   function buildShareLink(){
-    var payload={t:current};
-    // mapăm cheile scurte ca să nu fie URL gigant; pozele NU intră în link (prea mari) — vezi [DEV]
-    var keys={mireasa:'a',mire:'b',data:'c',ora:'o',oras:'r',poveste:'p',bisNume:'e',bisOra:'f',bisAdr:'g',bisHarta:'h',locNume:'i',locOra:'j',locAdr:'k',locHarta:'l',deadline:'m',whatsapp:'w'};
-    for(var key in keys){ if(D[key]) payload[keys[key]]=D[key]; }
+    // includ TOATE datele + pozele (URL-uri scurte de pe GHL, incap in link)
+    var payload={ sablon_ales: current, date: {
+      mireasa:D.mireasa, mire:D.mire, data:D.data, ora:D.ora, oras:D.oras, poveste:D.poveste,
+      cover:D.cover, story:D.story,
+      bisNume:D.bisNume, bisOra:D.bisOra, bisAdr:D.bisAdr, bisHarta:D.bisHarta,
+      locNume:D.locNume, locOra:D.locOra, locAdr:D.locAdr, locHarta:D.locHarta,
+      deadline:D.deadline, whatsapp:D.whatsapp
+    }};
     var encoded=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
-    // [DEV] înlocuiți baza cu URL-ul real al paginii-vizualizator din platformă:
     var base='https://butcuu.github.io/wd/invitatie.html';
     return base+'#'+encoded;
   }

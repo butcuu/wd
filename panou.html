@@ -186,13 +186,13 @@
         tool("comparator","⚖️","ic-sage","Comparator furnizori","Pune furnizorii față în față și alege pe valoare, nu doar pe preț.",qs)+
         tool("creator","💌","ic-blue","Creează invitația","Invitația ta, gata în câteva minute. Cu poză și RSVP.",qs)+
       '</div>'+
-      '<div class="backbar"><a href="#" data-back>← Înapoi la curs</a></div>';
+      '<div class="backbar"><a href="https://vsu1yqyciwfpxmbuclmi.app.clientclub.net" data-back>← Înapoi la video</a></div>';
 
     el("wd-root").innerHTML = '<div class="hero">'+salut+'</div>'+cd+stats+menu;
 
     // leg butonul inapoi la curs (prima lectie / outline) — il las # pana decizi
     var bk=document.querySelector('#wd-panou [data-back]');
-    if(bk) bk.onclick=function(e){ e.preventDefault(); history.length>1?history.back():null; };
+    if(bk) bk.onclick=function(e){ e.preventDefault(); window.top.location.href='https://vsu1yqyciwfpxmbuclmi.app.clientclub.net'; };
   }
 
   function tool(key,ic,cls,title,desc,qs){
