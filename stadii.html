@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Wedding Direction — Drumul tău</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fcf8f3}
+
+#wd-stadii *{margin:0;padding:0;box-sizing:border-box}
+#wd-stadii{
+  --gold:#b7934f; --gold-dark:#9b7938; --gold-soft:#f6eedf;
+  --rose:#c98d7c; --rose-soft:#fbefeb;
+  --ink:#2b2622; --text:#4f463f; --paper:#fcf8f3;
+  --line:#e9e0d2; --muted:#9a9084;
+  font-family:'Inter',sans-serif; color:var(--text);
+  background:var(--paper);
+  padding:24px 16px 60px; line-height:1.6;
+}
+#wd-stadii .serif{font-family:'Cormorant Garamond',serif}
+#wd-stadii .topbar{height:5px;background:linear-gradient(90deg,var(--gold),var(--rose),var(--gold));border-radius:5px;max-width:760px;margin:0 auto 26px}
+
+#wd-stadii .hero{max-width:760px;margin:0 auto 34px;text-align:center}
+#wd-stadii .brand{font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dark);font-weight:600}
+#wd-stadii .brand small{display:block;font-size:10px;letter-spacing:2px;color:var(--rose);margin-top:2px;font-weight:500}
+#wd-stadii .title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--ink);margin:18px 0 8px;line-height:1.05}
+#wd-stadii .sub{font-size:15.5px;color:var(--text);max-width:520px;margin:0 auto}
+@media(max-width:600px){#wd-stadii .title{font-size:31px}}
+
+/* drumul */
+#wd-stadii .path{position:relative;max-width:760px;margin:0 auto}
+#wd-stadii .path::before{content:"";position:absolute;left:27px;top:26px;bottom:66px;width:2px;
+  background:linear-gradient(var(--gold) 0%,var(--gold) var(--filled,18%),var(--line) var(--filled,18%))}
+@media(max-width:600px){#wd-stadii .path::before{left:23px}}
+
+#wd-stadii .stage{position:relative;display:flex;gap:20px;align-items:flex-start;padding-bottom:20px}
+@media(max-width:600px){#wd-stadii .stage{gap:14px}}
+
+#wd-stadii .marker{flex:0 0 auto;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:#fff;border:2px solid var(--line);position:relative;z-index:2;
+  font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--muted)}
+@media(max-width:600px){#wd-stadii .marker{width:48px;height:48px;font-size:20px}}
+#wd-stadii .stage.open .marker{background:var(--gold);border-color:var(--gold);color:#fff;box-shadow:0 6px 18px rgba(183,147,79,.35)}
+#wd-stadii .stage.current .marker::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--gold);opacity:.5;animation:wdp 2.4s ease-out infinite}
+@keyframes wdp{0%{transform:scale(1);opacity:.5}70%{transform:scale(1.25);opacity:0}100%{opacity:0}}
+#wd-stadii .marker svg{width:20px;height:20px}
+
+#wd-stadii .card{flex:1 1 auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+@media(max-width:600px){#wd-stadii .card{padding:18px}}
+#wd-stadii .stage.open .card{border-color:var(--gold);box-shadow:0 8px 24px rgba(43,38,34,.06)}
+#wd-stadii .stage.locked .card{background:#fbf6ee}
+
+#wd-stadii .ctop{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:7px}
+#wd-stadii .sname{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:var(--ink);line-height:1.1}
+@media(max-width:600px){#wd-stadii .sname{font-size:22px}}
+#wd-stadii .stage.locked .sname{color:#6b6258}
+#wd-stadii .count{font-size:12.5px;font-weight:700;letter-spacing:.5px;color:var(--gold-dark);white-space:nowrap}
+#wd-stadii .stage.locked .count{color:var(--muted)}
+#wd-stadii .teaser{font-size:14px;line-height:1.55;color:#5a5249}
+#wd-stadii .stage.locked .teaser{color:#837a6f}
+
+#wd-stadii .foot{margin-top:15px}
+#wd-stadii .pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--gold-dark);
+  background:var(--gold-soft);border:1px solid var(--line);padding:7px 13px;border-radius:99px}
+#wd-stadii .pill svg{width:13px;height:13px}
+#wd-stadii .btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;
+  border:none;border-radius:99px;padding:11px 22px;text-decoration:none;background:var(--gold);color:#fff;
+  box-shadow:0 4px 12px rgba(183,147,79,.3);transition:transform .15s,box-shadow .15s}
+#wd-stadii .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(183,147,79,.4)}
+#wd-stadii .btn:focus-visible{outline:3px solid var(--gold-dark);outline-offset:3px}
+
+#wd-stadii .stage.final .marker{background:#fff;border-color:var(--gold);color:var(--gold-dark)}
+#wd-stadii .stage.final.open .marker{background:var(--gold);color:#fff}
+
+#wd-stadii .upsell{max-width:760px;margin:18px auto 0;background:linear-gradient(135deg,var(--ink),#3a332c);border-radius:16px;
+  padding:24px 26px;color:#f6eedf;display:none;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+#wd-stadii .upsell .ut{flex:1 1 280px}
+#wd-stadii .upsell .uh{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;line-height:1.15;margin-bottom:6px}
+#wd-stadii .upsell .up{font-size:13.5px;color:#ddd2bf;line-height:1.5}
+
+#wd-stadii .backbar{max-width:760px;margin:30px auto 0;text-align:center}
+#wd-stadii .backbar a{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);color:var(--text);
+  text-decoration:none;font-weight:600;font-size:13px;padding:10px 20px;border-radius:22px}
+#wd-stadii .backbar a:hover{border-color:var(--gold);color:var(--gold-dark)}
+
+#wd-stadii .state{max-width:560px;margin:40px auto;text-align:center;padding:30px;background:#fff;border:1px solid var(--line);border-radius:16px}
+#wd-stadii .state .ic{font-size:36px;margin-bottom:12px}
+#wd-stadii .state h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="wd-stadii">
+
+  <div class="topbar"></div>
+  <div class="hero">
+    <div class="brand">Wedding Direction<small>by Oana</small></div>
+    <div class="title serif">Drumul tău spre nuntă</div>
+    <div class="sub">Le vezi pe toate de la început — ca să știi exact unde mergi. Se deblochează pe rând, în ritmul tău.</div>
+  </div>
+
+  <div id="wd-root">
+    <div class="state"><div class="ic">⏳</div><h2 class="serif">Se încarcă drumul tău...</h2></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* === ACELAȘI val.town ca panou.html === */
+  var WD_API = "https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
+
+  /* === URL-urile celor 5 produse-stadiu (separate) ===
+     Înlocuiește fiecare cu adresa produsului din portal (o iei din bara browserului
+     când deschizi produsul ca membră). Linkurile sunt opționale — dacă le lași așa,
+     butonul „Intră în stadiu" nu duce nicăieri, dar restul merge perfect. */
+  var STAGE_URLS = {
+    1: "INLOCUIESTE_URL_STADIUL_1",
+    2: "INLOCUIESTE_URL_STADIUL_2",
+    3: "INLOCUIESTE_URL_STADIUL_3",
+    4: "INLOCUIESTE_URL_STADIUL_4",
+    5: "INLOCUIESTE_URL_STADIUL_5"
+  };
+
+  /* === structură FIXĂ === */
+  var STAGES = [
+    { id:1, name:"Fundația", clips:17, teaser:"Aici punem temelia: viziunea voastră, invitații, bugetul real. Tot ce vine după se sprijină pe ce decizi acum." },
+    { id:2, name:"Decizii mari", clips:20, teaser:"Localul, meniul, furnizorii mari. Deciziile care îți mănâncă bugetul dacă le iei pe grabă." },
+    { id:3, name:"Furnizori & detalii", clips:13, teaser:"Foto-video, muzică, decor, flori. Cum alegi, cum negociezi și ce întrebi înainte să semnezi." },
+    { id:4, name:"Program & logistică", clips:16, teaser:"Programul zilei minut cu minut, cazări, transport. Ca ziua să curgă fără să stai tu la cârmă." },
+    { id:5, name:"Final & Ziua Nunții", clips:12, final:true, teaser:"Ultimele săptămâni și ziua în sine. Geanta miresei, check-ul final, cum să fii prezentă — nu stresată." }
+  ];
+
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  var RING = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M9 7l3-4 3 4"/></svg>';
+
+  /* === citește cid exact ca panou.html === */
+  function getCid(){
+    try{ var p=new URLSearchParams(location.search); if(p.get("cid")) return p.get("cid"); }catch(e){}
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k=localStorage.key(i);
+        if(k&&k.indexOf("firebase:authUser")>-1){
+          var d=JSON.parse(localStorage.getItem(k));
+          if(d&&d.stsTokenManager&&d.stsTokenManager.accessToken){
+            var pl=JSON.parse(atob(d.stsTokenManager.accessToken.split(".")[1].replace(/-/g,'+').replace(/_/g,'/')));
+            if(pl.contact_id) return pl.contact_id;
+          }
+        }
+      }
+    }catch(e){}
+    return null;
+  }
+  var CID=getCid();
+  function el(id){return document.getElementById(id);}
+
+  function render(planType, stadiuMax){
+    var isComplet = String(planType||"").toLowerCase() === "complet";
+    var maxOpen = isComplet ? 5 : (stadiuMax || 1);
+    var html = '<div class="path" id="wdPath">';
+    var openCount = 0;
+
+    STAGES.forEach(function(s){
+      var open = s.id <= maxOpen;
+      var current = open && s.id === maxOpen && !isComplet;
+      if(open) openCount++;
+      var marker = (s.final && !open) ? RING : (open ? s.id : LOCK);
+
+      var foot;
+      if(open){
+        var url = STAGE_URLS[s.id];
+        var href = (url && url.indexOf("INLOCUIESTE")===-1) ? url : "#";
+        foot = '<a class="btn" href="'+href+'">Intră în stadiu →</a>';
+      } else {
+        foot = '<span class="pill">'+LOCK+' Se deblochează în Luna '+s.id+'</span>';
+      }
+
+      html +=
+        '<div class="stage '+(open?"open":"locked")+(current?" current":"")+(s.final?" final":"")+'">'+
+          '<div class="marker">'+marker+'</div>'+
+          '<div class="card">'+
+            '<div class="ctop"><div class="sname serif">'+s.id+'. '+s.name+'</div>'+
+              '<div class="count">'+s.clips+' LECȚII</div></div>'+
+            '<div class="teaser">'+s.teaser+'</div>'+
+            '<div class="foot">'+foot+'</div>'+
+          '</div>'+
+        '</div>';
+    });
+    html += '</div>';
+
+    /* upsell doar pe lunar cu stadii blocate */
+    if(!isComplet && maxOpen < 5){
+      html +=
+        '<div class="upsell" style="display:flex">'+
+          '<div class="ut"><div class="uh serif">Nu vrei să aștepți de la o lună la alta?</div>'+
+          '<div class="up">Treci la acces complet și deblochezi toate cele 78 de lecții acum — rămân ale tale până la 30 de zile după nuntă.</div></div>'+
+          '<a class="btn" href="/complet">Vezi accesul complet →</a>'+
+        '</div>';
+    }
+
+    html += '<div class="backbar"><a href="#" data-back>← Înapoi la panou</a></div>';
+
+    el("wd-root").innerHTML = html;
+
+    var p = document.getElementById("wdPath");
+    if(p) p.style.setProperty("--filled", Math.round((openCount/STAGES.length)*100)+"%");
+
+    var bk=document.querySelector('#wd-stadii [data-back]');
+    if(bk) bk.onclick=function(e){
+      e.preventDefault();
+      var panou = "https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/91ca406c-00bf-4a4c-ab24-f47971007e1c";
+      try{ window.top.location.href = panou; }catch(_){ location.href = panou; }
+    };
+  }
+
+  function load(){
+    if(!CID){ render("lunar", 1); return; }   /* fallback sigur: Stadiul 1 deblocat */
+    fetch(WD_API+"?cid="+encodeURIComponent(CID))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var d = (j && j.ok) ? j : {};
+        var plan = d.plan_type || d.planType || "lunar";
+        var stadiu = parseInt(d.stadiu_max!=null ? d.stadiu_max : d.stadiuMax, 10);
+        if(isNaN(stadiu) || stadiu < 1) stadiu = 1;
+        if(stadiu > 5) stadiu = 5;
+        render(plan, stadiu);
+      })
+      .catch(function(){ render("lunar", 1); }); /* dacă pică, nu se strică nimic */
+  }
+
+  load();
+})();
+</script>
+
+<!-- raportare înălțime către părinte (IDENTIC cu panou.html) -->
+<script>
+(function(){
+  var last = 0;
+  function send(){
+    try {
+      var h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0,
+        document.documentElement.offsetHeight
+      );
+      if (h > 100 && Math.abs(h - last) > 3) {
+        last = h;
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ wdHeight: h }, "*");
+        }
+      }
+    } catch(e){}
+  }
+  if (document.readyState === "complete") send();
+  else window.addEventListener("load", send);
+  setInterval(send, 500);
+  try { if (window.ResizeObserver) { new ResizeObserver(send).observe(document.documentElement); } } catch(e){}
+})();
+</script>
+
+</body>
+</html>
