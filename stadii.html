@@ -135,6 +135,15 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
     5: "https://weddingdirection.app.clientclub.net/courses/products/5b21aad7-b4ef-41cf-86b7-de1ad88c2f42"
   };
 
+  /* Upgrade pe stadiu: 999 - (luni x 149), minim 499. Stadiul ~ luna platita. */
+  var UPGRADE = {
+    1: { pret: 850, url: "https://weddingdirection.ro/upgrade-subscription" },
+    2: { pret: 701, url: "https://weddingdirection.ro/imbunatateste-planul" },
+    3: { pret: 552, url: "https://weddingdirection.ro/upgrade-plan" },
+    4: { pret: 499, url: "https://weddingdirection.ro/upgrade" },
+    5: { pret: 499, url: "https://weddingdirection.ro/upgrade" }
+  };
+
   /* Verifică titlurile față de produsele tale reale și corectează aici unde diferă.
      Numărul de lecții se calculează automat din listă. */
   var STAGES = [
@@ -259,11 +268,12 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
     html += '</div>';
 
     if(!isComplet && maxOpen < 5){
+      var up = UPGRADE[maxOpen] || UPGRADE[1];
       html +=
         '<div class="upsell" style="display:flex">'+
           '<div class="ut"><div class="uh serif">Nu vrei să aștepți de la o lună la alta?</div>'+
-          '<div class="up">Treci la acces complet și deblochezi toate lecțiile acum — rămân ale tale până la 30 de zile după nuntă.</div></div>'+
-          '<a class="btn" href="/complet">Vezi accesul complet &rarr;</a>'+
+          '<div class="up">Treci la acces complet pentru doar '+up.pret+' lei (în loc de 999) — deblochezi toate lecțiile acum și rămân ale tale până la 30 de zile după nuntă.</div></div>'+
+          '<a class="btn" href="'+up.url+'">Treci la complet &rarr;</a>'+
         '</div>';
     }
 
