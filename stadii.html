@@ -28,7 +28,6 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 #wd-stadii .sub{font-size:15.5px;color:var(--text);max-width:520px;margin:0 auto}
 @media(max-width:600px){#wd-stadii .title{font-size:31px}}
 
-/* drumul */
 #wd-stadii .path{position:relative;max-width:760px;margin:0 auto}
 #wd-stadii .path::before{content:"";position:absolute;left:27px;top:26px;bottom:66px;width:2px;
   background:linear-gradient(var(--gold) 0%,var(--gold) var(--filled,18%),var(--line) var(--filled,18%))}
@@ -60,6 +59,23 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 #wd-stadii .teaser{font-size:14px;line-height:1.55;color:#5a5249}
 #wd-stadii .stage.locked .teaser{color:#837a6f}
 
+#wd-stadii .acc{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}
+#wd-stadii .acc summary{list-style:none;cursor:pointer;font-size:13px;font-weight:700;color:var(--gold-dark);
+  padding:9px 0;display:flex;align-items:center;gap:6px;user-select:none}
+#wd-stadii .acc summary::-webkit-details-marker{display:none}
+#wd-stadii .acc .chev{transition:transform .2s;font-size:11px}
+#wd-stadii .acc[open] .chev{transform:rotate(180deg)}
+#wd-stadii .acc-body{padding:2px 0 4px}
+#wd-stadii .cat{margin-bottom:13px}
+#wd-stadii .cat:last-child{margin-bottom:2px}
+#wd-stadii .catname{font-family:'Cormorant Garamond',serif;font-size:16.5px;font-weight:600;color:var(--ink);margin-bottom:5px}
+#wd-stadii .stage.locked .catname{color:#6b6258}
+#wd-stadii .acc ul{list-style:none;margin:0;padding:0}
+#wd-stadii .acc li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:#6b6258;padding:3px 0;line-height:1.45}
+#wd-stadii .acc li svg{width:12px;height:12px;flex:0 0 auto;margin-top:3px}
+#wd-stadii .acc li .lk{color:#c3b8a7}
+#wd-stadii .acc li .dt{color:var(--gold)}
+
 #wd-stadii .foot{margin-top:15px}
 #wd-stadii .pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--gold-dark);
   background:var(--gold-soft);border:1px solid var(--line);padding:7px 13px;border-radius:99px}
@@ -73,11 +89,11 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 #wd-stadii .stage.final .marker{background:#fff;border-color:var(--gold);color:var(--gold-dark)}
 #wd-stadii .stage.final.open .marker{background:var(--gold);color:#fff}
 
-#wd-stadii .upsell{max-width:760px;margin:18px auto 0;background:linear-gradient(135deg,var(--ink),#3a332c);border-radius:16px;
-  padding:24px 26px;color:#f6eedf;display:none;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+#wd-stadii .upsell{max-width:760px;margin:18px auto 0;background:linear-gradient(135deg,#fff,var(--gold-soft));border:1px solid var(--gold);border-radius:16px;
+  padding:24px 26px;color:var(--text);display:none;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
 #wd-stadii .upsell .ut{flex:1 1 280px}
-#wd-stadii .upsell .uh{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;line-height:1.15;margin-bottom:6px}
-#wd-stadii .upsell .up{font-size:13.5px;color:#ddd2bf;line-height:1.5}
+#wd-stadii .upsell .uh{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;line-height:1.15;margin-bottom:6px;color:var(--ink)}
+#wd-stadii .upsell .up{font-size:13.5px;color:var(--text);line-height:1.5}
 
 #wd-stadii .backbar{max-width:760px;margin:30px auto 0;text-align:center}
 #wd-stadii .backbar a{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);color:var(--text);
@@ -96,11 +112,11 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
   <div class="hero">
     <div class="brand">Wedding Direction<small>by Oana</small></div>
     <div class="title serif">Drumul tău spre nuntă</div>
-    <div class="sub">Le vezi pe toate de la început — ca să știi exact unde mergi. Se deblochează pe rând, în ritmul tău.</div>
+    <div class="sub">Le vezi pe toate de la început — ca să știi exact unde mergi. Apasă pe „Vezi ce conține” ca să descoperi fiecare etapă.</div>
   </div>
 
   <div id="wd-root">
-    <div class="state"><div class="ic">⏳</div><h2 class="serif">Se încarcă drumul tău...</h2></div>
+    <div class="state"><div class="ic">&#9203;</div><h2 class="serif">Se încarcă drumul tău...</h2></div>
   </div>
 
 </div>
@@ -109,34 +125,73 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 (function(){
   "use strict";
 
-  /* === ACELAȘI val.town ca panou.html === */
   var WD_API = "https://weddingdirection--29098e585ebd11f1bac21607ee4eb77e.web.val.run";
 
-  /* === URL-urile celor 5 produse-stadiu (separate) ===
-     Înlocuiește fiecare cu adresa produsului din portal (o iei din bara browserului
-     când deschizi produsul ca membră). Linkurile sunt opționale — dacă le lași așa,
-     butonul „Intră în stadiu" nu duce nicăieri, dar restul merge perfect. */
   var STAGE_URLS = {
-    1: "INLOCUIESTE_URL_STADIUL_1",
-    2: "INLOCUIESTE_URL_STADIUL_2",
-    3: "INLOCUIESTE_URL_STADIUL_3",
-    4: "INLOCUIESTE_URL_STADIUL_4",
-    5: "INLOCUIESTE_URL_STADIUL_5"
+    1: "https://weddingdirection.app.clientclub.net/courses/products/b4808dc9-226d-4044-b055-5e9e693b9df7",
+    2: "https://weddingdirection.app.clientclub.net/courses/products/0a1172f6-08fd-441c-a3fb-1eea60d080a9",
+    3: "https://weddingdirection.app.clientclub.net/courses/products/1a20a9f2-40e3-470e-862c-f95c701d19a2",
+    4: "https://weddingdirection.app.clientclub.net/courses/products/a5ae1cda-1dbf-40c9-8230-4c754c9e315f",
+    5: "https://weddingdirection.app.clientclub.net/courses/products/5b21aad7-b4ef-41cf-86b7-de1ad88c2f42"
   };
 
-  /* === structură FIXĂ === */
+  /* Verifică titlurile față de produsele tale reale și corectează aici unde diferă.
+     Numărul de lecții se calculează automat din listă. */
   var STAGES = [
-    { id:1, name:"Fundația", clips:17, teaser:"Aici punem temelia: viziunea voastră, invitații, bugetul real. Tot ce vine după se sprijină pe ce decizi acum." },
-    { id:2, name:"Decizii mari", clips:20, teaser:"Localul, meniul, furnizorii mari. Deciziile care îți mănâncă bugetul dacă le iei pe grabă." },
-    { id:3, name:"Furnizori & detalii", clips:13, teaser:"Foto-video, muzică, decor, flori. Cum alegi, cum negociezi și ce întrebi înainte să semnezi." },
-    { id:4, name:"Program & logistică", clips:16, teaser:"Programul zilei minut cu minut, cazări, transport. Ca ziua să curgă fără să stai tu la cârmă." },
-    { id:5, name:"Final & Ziua Nunții", clips:12, final:true, teaser:"Ultimele săptămâni și ziua în sine. Geanta miresei, check-ul final, cum să fii prezentă — nu stresată." }
+    { id:1, name:"Fundația", final:false,
+      teaser:"Aici punem temelia: viziunea voastră, invitații, bugetul real. Tot ce vine după se sprijină pe ce decizi acum.",
+      content:[
+        { cat:"Direcție & Viziune", items:["Ce fel de nuntă vreți — conversația pe care nimeni nu o are","Prioritățile voastre — unde merită investit și unde nu","Decizii fixe vs. negociabile — cum te protejezi de presiunea familiei"] },
+        { cat:"Invitați", items:["Câți invitați aveți — metoda celor 3 cercuri","Invitații „de politețe” — cea mai scumpă greșeală","Cum implici mirele în lista de invitați fără ceartă"] },
+        { cat:"Buget", items:["Bugetul — de unde vin banii real la o nuntă","Bugetul pe categorii — cum împarți banii inteligent","Tracker-ul de buget — estimat vs. real, cum funcționează","Nu-ți fie rușine de bugetul vostru"] },
+        { cat:"Data nunții", items:["Data nunții — de ce nu alegi doar ce e liber","Vineri, sâmbătă sau duminică — ce schimbă ziua săptămânii"] },
+        { cat:"Primii pași spre local", items:["Cum cauți localuri — de unde începi","Ce verifici la vizita la local — cele 15 puncte critice","Ce faci după vizite — cum compari și cum nu te grăbești"] },
+        { cat:"Tipuri de nuntă", items:["Nunta în aer liber — ce trebuie să știi înainte să te decizi","Nunta clasică — biserică + sală / restaurant / ballroom","Nunta cu personalitate — tradițională / boho / tematică / micro"] }
+      ] },
+    { id:2, name:"Decizii mari", final:false,
+      teaser:"Localul, meniul, furnizorii mari. Deciziile care îți mănâncă bugetul dacă le iei pe grabă.",
+      content:[
+        { cat:"Localul — decizia finală", items:["Cum compari localuri obiectiv — nu pe emoție, pe date","Meniul și tasting-ul — ce verifici ca să nu ai surprize","Contractul cu localul — ce verifici înainte de semnătură","Cum negociezi cu localul — concret, fără jenă"] },
+        { cat:"Foto & Video", items:["De ce foto-video e diferit de orice alt furnizor","Stiluri de fotografie — cum le recunoști și pe care-l alegi","Cum evaluezi un portofoliu — galerie completă, nu highlight","Chimia cu fotograful și întrebările pe care le pui","Cât costă real foto-video în România și contractul"] },
+        { cat:"Muzică / DJ / Trupă", items:["DJ vs. trupă vs. formație — ce se potrivește stilului vostru","Cum alegi un DJ bun — nu doar „pune muzică”","Sonorizarea — de ce contează și cine o asigură"] },
+        { cat:"Cum lucrezi cu furnizorii", items:["Cum ceri oferte corect — mesajul care funcționează","Cum compari oferte diferite — mere cu mere","Cum negociezi cu furnizorii — 3 tehnici care funcționează","Contractul cu orice furnizor — 8 puncte pe care le verifici mereu"] },
+        { cat:"Decor & Flori — primele direcții", items:["Cum alegi un decorator — portofoliu vs. realitate","Bugetul de decor — unde merită investit și unde nu","Cum comunici viziunea ta decoratorului — ce trimiți și ce nu"] }
+      ] },
+    { id:3, name:"Furnizori & detalii", final:false,
+      teaser:"Foto-video, muzică, decor, flori. Cum alegi, cum negociezi și ce întrebi înainte să semnezi.",
+      content:[
+        { cat:"Decor & Flori — decizia finală", items:["Cum iei decizia finală pe decorator","Flori de sezon vs. import — cum economisești fără să se vadă","Coordonarea decorator + local + fotograf"] },
+        { cat:"Rochie, costum, look", items:["Cum alegi rochia — când începi, cu cine mergi, ce buget","Costumul mirelui — nu e „merge orice”","Makeup & coafură — cum alegi și ce testezi la probă","Accesorii, pantofi, voal — detaliile pe care le uiți"] },
+        { cat:"Tort, candy bar, papetărie", items:["Tortul de nuntă — ce alegi, cât costă, ce capcane există","Invitațiile — fizice, digitale sau ambele","Mărturii — merită investiția sau nu?"] },
+        { cat:"Invitați — de la estimativ la nominal", items:["De la cercuri la nume — cum faci lista nominală","Copiii la nuntă — invitați sau nu, cum gestionezi","Cum recalculezi bugetul cu lista reală de invitați"] },
+        { cat:"Meniu final & detalii local", items:["Meniul final — confirmare, meniuri speciale, băutura","Aranjarea meselor — mai stresantă decât pare","Recapitulare Stadiul 3 — unde ești și ce urmează"] }
+      ] },
+    { id:4, name:"Program & logistică", final:false,
+      teaser:"Programul zilei minut cu minut, cazări, transport. Ca ziua să curgă fără să stai tu la cârmă.",
+      content:[
+        { cat:"Programul zilei", items:["Cum construiești programul zilei — timeline realistă, nu idealistă","Ora de aur — ce e și de ce contează enorm pentru poze","Ceremonia — ce planifici, ce deleghezi, ce poate merge prost","Programul petrecerii — ce momente, în ce ordine, cât durează"] },
+        { cat:"Coordonarea furnizorilor", items:["Fiecare furnizor primește programul zilei — cum și când","Persoana de contact din ziua nunții — de ce ai nevoie de una","Grupul de WhatsApp cu furnizorii — cum și când"] },
+        { cat:"Detalii finale", items:["Transportul — cine merge unde și cum ajunge","Cadourile pentru nași și părinți — ce, când și cum","Playlist-ul și comunicarea cu DJ-ul — lista finală"] },
+        { cat:"Ședința foto & comunicarea cu fotograful", items:["Ce comunici fotografului înainte de nuntă — briefing-ul complet","Locația sesiunii foto — unde mergeți și cum alegeți","Recapitulare Stadiul 4 — totul e asamblat, ce urmează"] }
+      ] },
+    { id:5, name:"Final & Ziua Nunții", final:true,
+      teaser:"Ultimele săptămâni și ziua în sine. Geanta miresei, check-ul final, cum să fii prezentă — nu stresată.",
+      content:[
+        { cat:"Ultimele verificări", items:["Confirmarea finală a invitaților — cum o faci fără haos","Check final furnizori — ce confirmi cu fiecare","Geanta miresei — tot ce iei cu tine"] },
+        { cat:"Pregătirea emoțională", items:["Stresul de dinaintea nunții — e normal, nu ești singura","Ce faci dacă ceva nu merge — plan B real","Scrisoare către tine — citește asta în dimineața nunții"] },
+        { cat:"Ziua nunții", items:["Dimineața nunții — programul, atmosfera, momentul tău","Ceremonia și recepția — cum fii prezentă, nu pe pilot automat","Petrecerea și finalul — cum te bucuri până la ultimul dans"] },
+        { cat:"După nuntă", items:["Săptămâna de după nuntă — mulțumiri, review-uri, relaxare","Galeria foto — cum o folosești și cum o împărtășești","Bilanțul nunții — ce a funcționat, ce ai învățat, ce urmează"] }
+      ] }
   ];
 
   var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
   var RING = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M9 7l3-4 3 4"/></svg>';
+  var LOCKMINI = '<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  var DOTMINI = '<svg class="dt" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>';
 
-  /* === citește cid exact ca panou.html === */
+  function esc(s){return String(s==null?"":s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function countItems(content){ var n=0; content.forEach(function(c){ n+=c.items.length; }); return n; }
+
   function getCid(){
     try{ var p=new URLSearchParams(location.search); if(p.get("cid")) return p.get("cid"); }catch(e){}
     try{
@@ -156,6 +211,19 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
   var CID=getCid();
   function el(id){return document.getElementById(id);}
 
+  function accordion(s, open){
+    var body="";
+    s.content.forEach(function(c){
+      var lis="";
+      c.items.forEach(function(it){
+        lis += '<li>'+(open?DOTMINI:LOCKMINI)+'<span>'+esc(it)+'</span></li>';
+      });
+      body += '<div class="cat"><div class="catname">'+esc(c.cat)+'</div><ul>'+lis+'</ul></div>';
+    });
+    return '<details class="acc"><summary>Vezi ce conține <span class="chev">&#9662;</span></summary>'+
+           '<div class="acc-body">'+body+'</div></details>';
+  }
+
   function render(planType, stadiuMax){
     var isComplet = String(planType||"").toLowerCase() === "complet";
     var maxOpen = isComplet ? 5 : (stadiuMax || 1);
@@ -167,12 +235,11 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
       var current = open && s.id === maxOpen && !isComplet;
       if(open) openCount++;
       var marker = (s.final && !open) ? RING : (open ? s.id : LOCK);
+      var total = countItems(s.content);
 
       var foot;
       if(open){
-        var url = STAGE_URLS[s.id];
-        var href = (url && url.indexOf("INLOCUIESTE")===-1) ? url : "#";
-        foot = '<a class="btn" href="'+href+'">Intră în stadiu →</a>';
+        foot = '<a class="btn" href="'+(STAGE_URLS[s.id]||'#')+'">Intră în stadiu &rarr;</a>';
       } else {
         foot = '<span class="pill">'+LOCK+' Se deblochează în Luna '+s.id+'</span>';
       }
@@ -181,26 +248,26 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
         '<div class="stage '+(open?"open":"locked")+(current?" current":"")+(s.final?" final":"")+'">'+
           '<div class="marker">'+marker+'</div>'+
           '<div class="card">'+
-            '<div class="ctop"><div class="sname serif">'+s.id+'. '+s.name+'</div>'+
-              '<div class="count">'+s.clips+' LECȚII</div></div>'+
-            '<div class="teaser">'+s.teaser+'</div>'+
+            '<div class="ctop"><div class="sname serif">'+s.id+'. '+esc(s.name)+'</div>'+
+              '<div class="count">'+total+' LECȚII</div></div>'+
+            '<div class="teaser">'+esc(s.teaser)+'</div>'+
+            accordion(s, open)+
             '<div class="foot">'+foot+'</div>'+
           '</div>'+
         '</div>';
     });
     html += '</div>';
 
-    /* upsell doar pe lunar cu stadii blocate */
     if(!isComplet && maxOpen < 5){
       html +=
         '<div class="upsell" style="display:flex">'+
           '<div class="ut"><div class="uh serif">Nu vrei să aștepți de la o lună la alta?</div>'+
-          '<div class="up">Treci la acces complet și deblochezi toate cele 78 de lecții acum — rămân ale tale până la 30 de zile după nuntă.</div></div>'+
-          '<a class="btn" href="/complet">Vezi accesul complet →</a>'+
+          '<div class="up">Treci la acces complet și deblochezi toate lecțiile acum — rămân ale tale până la 30 de zile după nuntă.</div></div>'+
+          '<a class="btn" href="/complet">Vezi accesul complet &rarr;</a>'+
         '</div>';
     }
 
-    html += '<div class="backbar"><a href="#" data-back>← Înapoi la panou</a></div>';
+    html += '<div class="backbar"><a href="#" data-back>&larr; Înapoi la panou</a></div>';
 
     el("wd-root").innerHTML = html;
 
@@ -216,7 +283,7 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
   }
 
   function load(){
-    if(!CID){ render("lunar", 1); return; }   /* fallback sigur: Stadiul 1 deblocat */
+    if(!CID){ render("lunar", 1); return; }
     fetch(WD_API+"?cid="+encodeURIComponent(CID))
       .then(function(r){ return r.json(); })
       .then(function(j){
@@ -227,14 +294,13 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
         if(stadiu > 5) stadiu = 5;
         render(plan, stadiu);
       })
-      .catch(function(){ render("lunar", 1); }); /* dacă pică, nu se strică nimic */
+      .catch(function(){ render("lunar", 1); });
   }
 
   load();
 })();
 </script>
 
-<!-- raportare înălțime către părinte (IDENTIC cu panou.html) -->
 <script>
 (function(){
   var last = 0;
