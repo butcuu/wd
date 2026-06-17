@@ -462,6 +462,12 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
   }
   $('wd-save-btn').addEventListener('click', wdSave);
 
+  // [FIX] Autosave: salveaza si modificarile din tab "Estimare" (nu doar prin buton).
+  // Fara asta, numerele din cele 3 cercuri se pierdeau la reincarcare.
+  var wdAutoTimer=null;
+  function wdAutoSave(){ clearTimeout(wdAutoTimer); wdAutoTimer=setTimeout(function(){ try{ wdSave(); }catch(e){} },1500); }
+  (function(){ var root=document.getElementById('wd-inv'); if(root){ root.addEventListener('input', wdAutoSave); root.addEventListener('change', wdAutoSave); } })();
+
   // ════════ LOAD ════════
   // [DEV] Dacă aveți date salvate, puneți-le în window.WD_SAVED_INV înaintea acestui script.
   function wdApplyData(){
@@ -536,6 +542,32 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
       new ResizeObserver(send).observe(document.documentElement);
     }
   } catch(e){}
+})();
+</script>
+
+
+<script>
+/* WD mobile fix: tastatura numerica corecta + campul adus deasupra tastaturii */
+(function(){
+  function fixIM(t){
+    if(t && t.tagName==='INPUT' && t.getAttribute('type')==='number' && !t.getAttribute('inputmode')){
+      t.setAttribute('inputmode','numeric');
+    }
+  }
+  function up(e){
+    var t=e.target;
+    if(!t||!/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))return;
+    fixIM(t);
+    document.body.style.paddingBottom='45vh';
+    setTimeout(function(){
+      try{ t.scrollIntoView({block:'center',behavior:'smooth'}); }
+      catch(_){ try{ t.scrollIntoView(); }catch(__){} }
+    },300);
+  }
+  function down(){ document.body.style.paddingBottom=''; }
+  document.addEventListener('focusin',up);
+  document.addEventListener('focusout',down);
+  try{ var ns=document.querySelectorAll('input[type="number"]'); for(var i=0;i<ns.length;i++) fixIM(ns[i]); }catch(e){}
 })();
 </script>
 

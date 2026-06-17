@@ -336,5 +336,31 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 })();
 </script>
 
+
+<script>
+/* WD mobile fix: tastatura numerica corecta + campul adus deasupra tastaturii */
+(function(){
+  function fixIM(t){
+    if(t && t.tagName==='INPUT' && t.getAttribute('type')==='number' && !t.getAttribute('inputmode')){
+      t.setAttribute('inputmode','numeric');
+    }
+  }
+  function up(e){
+    var t=e.target;
+    if(!t||!/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))return;
+    fixIM(t);
+    document.body.style.paddingBottom='45vh';
+    setTimeout(function(){
+      try{ t.scrollIntoView({block:'center',behavior:'smooth'}); }
+      catch(_){ try{ t.scrollIntoView(); }catch(__){} }
+    },300);
+  }
+  function down(){ document.body.style.paddingBottom=''; }
+  document.addEventListener('focusin',up);
+  document.addEventListener('focusout',down);
+  try{ var ns=document.querySelectorAll('input[type="number"]'); for(var i=0;i<ns.length;i++) fixIM(ns[i]); }catch(e){}
+})();
+</script>
+
 </body>
 </html>
