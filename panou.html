@@ -41,6 +41,22 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 #wd-panou .cd.nodate .big{font-size:30px;color:var(--ink)}
 @media(max-width:600px){#wd-panou .cd .big .num{font-size:60px}#wd-panou .salut{font-size:32px}}
 
+/* DRUM — card-erou cu progresul pe stadii (ADAUGAT) */
+#wd-panou .drum{max-width:980px;margin:0 auto 30px;background:linear-gradient(135deg,#fff,var(--gold-soft));border:1px solid var(--line);border-radius:20px;padding:26px 28px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
+#wd-panou .drum .dl{flex:1 1 320px}
+#wd-panou .drum .dey{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);font-weight:700;margin-bottom:5px}
+#wd-panou .drum .dt{font-family:'Cormorant Garamond',serif;font-size:27px;font-weight:600;color:var(--ink);line-height:1.1;margin-bottom:18px}
+#wd-panou .drum .dots{display:flex;align-items:center}
+#wd-panou .drum .dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;background:#fff;border:2px solid var(--line);color:#c3b8a7;position:relative;z-index:2;flex:0 0 auto}
+#wd-panou .drum .dot.on{background:var(--gold);border-color:var(--gold);color:#fff;box-shadow:0 4px 12px rgba(183,147,79,.3)}
+#wd-panou .drum .dot.cur::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--gold);opacity:.5;animation:wddp 2.4s ease-out infinite}
+@keyframes wddp{0%{transform:scale(1);opacity:.5}70%{transform:scale(1.22);opacity:0}100%{opacity:0}}
+#wd-panou .drum .seg{height:2px;width:22px;background:var(--line);flex:0 0 auto}
+#wd-panou .drum .seg.on{background:var(--gold)}
+#wd-panou .drum .dbtn{flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:13px 24px;border-radius:24px;box-shadow:0 4px 14px rgba(183,147,79,.35);transition:transform .15s,box-shadow .15s}
+#wd-panou .drum .dbtn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(183,147,79,.45)}
+@media(max-width:600px){#wd-panou .drum{padding:22px}#wd-panou .drum .dt{font-size:23px}}
+
 /* 3 CIFRE CHEIE */
 #wd-panou .stats{max-width:980px;margin:0 auto 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media(max-width:600px){#wd-panou .stats{grid-template-columns:1fr}}
@@ -101,6 +117,7 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
   // ── linkuri lectii (portal) ──
   var BASE_LESSON = "https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/";
   var LESSONS = {
+    stadii:     "06237266-ce93-4ea3-bd18-2d4d125b9209",
     buget:      "48ea5cab-c32f-4ccb-a6c3-ba959f723785",
     invitati:   "46f55aa5-48b0-4022-8161-5be7d1c9be34",
     comparator: "c4f25fbc-8b4e-4471-9748-ae9c9fb2b01f",
@@ -168,6 +185,29 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
            '<div class="date" style="text-transform:none;letter-spacing:0;color:var(--text)">O completezi când ești gata 💛</div></div>';
     }
 
+    // DRUM — progresul pe stadii (ADAUGAT). Citeste defensiv; fallback sigur la etapa 1.
+    var plan = String(d.plan_type||d.planType||"lunar").toLowerCase();
+    var smax = parseInt(d.stadiu_max!=null ? d.stadiu_max : d.stadiuMax, 10);
+    if(isNaN(smax) || smax<1) smax=1;
+    if(smax>5) smax=5;
+    var isComplet = plan==="complet";
+    var maxOpen = isComplet ? 5 : smax;
+    var dots="";
+    for(var si=1; si<=5; si++){
+      if(si>1) dots += '<div class="seg'+(si<=maxOpen?' on':'')+'"></div>';
+      var cur = !isComplet && si===maxOpen;
+      dots += '<div class="dot'+(si<=maxOpen?' on':'')+(cur?' cur':'')+'">'+si+'</div>';
+    }
+    var drumTitle = isComplet ? "Ai acces la toate cele 5 etape" : ("Ești la etapa "+smax+" din 5");
+    var drumHref = lessonUrl("stadii") + (CID?("?cid="+encodeURIComponent(CID)):"");
+    var drum = '<div class="drum"><div class="dl">'+
+        '<div class="dey">Drumul tău spre nuntă</div>'+
+        '<div class="dt serif">'+drumTitle+'</div>'+
+        '<div class="dots">'+dots+'</div>'+
+      '</div>'+
+      '<a class="dbtn" href="'+drumHref+'">Vezi tot drumul →</a>'+
+    '</div>';
+
     // STATS
     var bugEst=nr(d.bugetEstimat), bugReal=nr(d.bugetReal);
     var invTot=nr(d.invitatiTotal), invConf=nr(d.invitatiConfirmati);
@@ -189,7 +229,7 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
       '</div>'+
       '<div class="backbar"><a href="https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e" data-back>← Înapoi la video</a></div>';
 
-    el("wd-root").innerHTML = '<div class="hero">'+salut+'</div>'+cd+stats+menu;
+    el("wd-root").innerHTML = '<div class="hero">'+salut+'</div>'+cd+drum+stats+menu;
 
     // leg butonul inapoi la curs (prima lectie / outline) — il las # pana decizi
     var bk=document.querySelector('#wd-panou [data-back]');
@@ -207,20 +247,6 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
   load();
 })();
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script>
 (function(){
@@ -240,12 +266,9 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
       }
     } catch(e){}
   }
-  // raportez la load + dupa asezarea fonturilor/imaginilor
   if (document.readyState === "complete") send();
   else window.addEventListener("load", send);
-  // raportez PERMANENT (lejer) - prinde orice schimbare, oricat de tarziu
   setInterval(send, 500);
-  // si imediat la schimbari de continut
   try {
     if (window.ResizeObserver) {
       new ResizeObserver(send).observe(document.documentElement);
