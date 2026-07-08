@@ -248,7 +248,7 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 
       var foot;
       if(open){
-        foot = '<a class="btn" href="'+(STAGE_URLS[s.id]||'#')+'">Intră în stadiu &rarr;</a>';
+        foot = '<a class="btn wd-top" target="_top" href="'+(STAGE_URLS[s.id]||'#')+'">Intră în stadiu &rarr;</a>';
       } else {
         foot = '<span class="pill">'+LOCK+' Se deblochează în Luna '+s.id+'</span>';
       }
@@ -273,7 +273,7 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
         '<div class="upsell" style="display:flex">'+
           '<div class="ut"><div class="uh serif">Nu vrei să aștepți de la o lună la alta?</div>'+
           '<div class="up">Treci la acces complet pentru doar '+up.pret+' lei (în loc de 999) — deblochezi toate lecțiile acum și rămân ale tale până la 30 de zile după nuntă.</div></div>'+
-          '<a class="btn" href="'+up.url+'">Treci la complet &rarr;</a>'+
+          '<a class="btn wd-top" target="_top" href="'+up.url+'">Treci la complet &rarr;</a>'+
         '</div>';
     }
 
@@ -290,6 +290,16 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
       var panou = "https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e/categories/75c08d8b-cd10-4347-a56e-31bc3d93c873/posts/91ca406c-00bf-4a4c-ab24-f47971007e1c";
       try{ window.top.location.href = panou; }catch(_){ location.href = panou; }
     };
+
+    // toate butoanele marcate wd-top ies din iframe (fix plata / fingerprint)
+    var tops = document.querySelectorAll('#wd-stadii a.wd-top');
+    Array.prototype.forEach.call(tops, function(a){
+      a.onclick = function(e){
+        e.preventDefault();
+        var u = this.href;
+        try{ window.top.location.href = u; }catch(_){ location.href = u; }
+      };
+    });
   }
 
   function load(){
