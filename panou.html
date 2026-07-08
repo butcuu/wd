@@ -39,6 +39,19 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 #wd-panou .cd .big .lbl{font-size:26px;color:var(--ink);margin-left:8px}
 #wd-panou .cd .date{font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--rose);margin-top:10px;font-weight:500}
 #wd-panou .cd.nodate .big{font-size:30px;color:var(--ink)}
+#wd-panou .cd .edit-link{display:inline-block;margin-top:14px;font-size:13px;color:var(--gold-dark);background:none;border:0;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:underline;text-underline-offset:3px}
+#wd-panou .cd .edit-link:hover{color:var(--gold)}
+#wd-panou .cd .editbox{display:none;margin-top:18px}
+#wd-panou .cd .editbox.open{display:block}
+#wd-panou .cd .editbox input[type=date]{padding:11px 16px;border:1px solid var(--line);border-radius:12px;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);background:#fff;outline:none}
+#wd-panou .cd .editbox input[type=date]:focus{border-color:var(--gold)}
+#wd-panou .cd .editbox .btns{margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#wd-panou .cd .editbox .savebtn{padding:11px 26px;border:0;border-radius:999px;background:var(--gold);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+#wd-panou .cd .editbox .savebtn:hover{background:var(--gold-dark)}
+#wd-panou .cd .editbox .savebtn:disabled{opacity:.6;cursor:default}
+#wd-panou .cd .editbox .cancelbtn{padding:11px 22px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer}
+#wd-panou .cd .edit-status{font-size:13px;margin-top:10px;min-height:18px;color:var(--sage);font-weight:500}
+#wd-panou .cd .edit-status.err{color:var(--rose)}
 @media(max-width:600px){#wd-panou .cd .big .num{font-size:60px}#wd-panou .salut{font-size:32px}}
 
 /* DRUM — card-erou cu progresul pe stadii (ADAUGAT) */
@@ -173,16 +186,32 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
     var salut = '<div class="salut serif">Bună'+(nume?", "+nume:"")+'! <span class="wave">👋</span></div>'+
                 '<div class="salut-sub">Aici ai tot ce-ți trebuie ca să-ți organizezi nunta cu cap. Fără stres, pas cu pas.</div>';
 
-    // COUNTDOWN
+    // COUNTDOWN (cu data editabilă)
+    var dataVal = "";
+    if(dataN){ try{ var dd=new Date(dataN); if(!isNaN(dd)) dataVal = dd.toISOString().slice(0,10); }catch(e){} }
+    var azi = new Date(); azi.setHours(0,0,0,0);
+    var minVal = azi.toISOString().slice(0,10);
+    var editbox = '<div class="editbox" id="wd-data-box">'+
+        '<input type="date" id="wd-data-input" value="'+dataVal+'" min="'+minVal+'">'+
+        '<div class="btns">'+
+          '<button class="savebtn" id="wd-data-save">Salvează data</button>'+
+          '<button class="cancelbtn" id="wd-data-cancel">Renunță</button>'+
+        '</div>'+
+        '<div class="edit-status" id="wd-data-status"></div>'+
+      '</div>';
     var cd;
     if(zile!=null && dataN){
       cd = '<div class="cd"><div class="lead">Până la nunta ta mai sunt</div>'+
            '<div class="big"><span class="num">'+zile+'</span><span class="lbl">'+(zile===1?'zi':'zile')+'</span></div>'+
-           '<div class="date">'+esc(fmtData(dataN))+'</div></div>';
+           '<div class="date">'+esc(fmtData(dataN))+'</div>'+
+           '<button class="edit-link" id="wd-data-edit">Schimbă data ✎</button>'+
+           editbox+'</div>';
     } else {
       cd = '<div class="cd nodate"><div class="lead">Data nunții</div>'+
            '<div class="big">Încă nu ai stabilit data</div>'+
-           '<div class="date" style="text-transform:none;letter-spacing:0;color:var(--text)">O completezi când ești gata 💛</div></div>';
+           '<div class="date" style="text-transform:none;letter-spacing:0;color:var(--text)">O completezi când ești gata 💛</div>'+
+           '<button class="edit-link" id="wd-data-edit">📅 Alege data nunții</button>'+
+           editbox+'</div>';
     }
 
     // DRUM — progresul pe stadii (ADAUGAT). Citeste defensiv; fallback sigur la etapa 1.
@@ -234,6 +263,37 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
     // leg butonul inapoi la curs (prima lectie / outline) — il las # pana decizi
     var bk=document.querySelector('#wd-panou [data-back]');
     if(bk) bk.onclick=function(e){ e.preventDefault(); window.top.location.href='https://weddingdirection.app.clientclub.net/courses/products/cff5b3b2-a658-422e-ba07-f1846161455e'; };
+
+    // ── editare dată nuntă ──
+    var eBtn=el("wd-data-edit"), eBox=el("wd-data-box"), eIn=el("wd-data-input"),
+        eSave=el("wd-data-save"), eCancel=el("wd-data-cancel"), eSt=el("wd-data-status");
+    if(eBtn && eBox){
+      eBtn.onclick=function(){ eBox.classList.add("open"); eBtn.style.display="none"; try{eIn.focus();}catch(e){} };
+      eCancel.onclick=function(){ eBox.classList.remove("open"); eBtn.style.display=""; eSt.textContent=""; eSt.classList.remove("err"); };
+      eSave.onclick=function(){
+        var v=eIn.value;
+        eSt.classList.remove("err");
+        if(!v){ eSt.textContent="Alege o dată din calendar."; eSt.classList.add("err"); return; }
+        if(!CID){ eSt.textContent="Nu te pot identifica — reîncarcă pagina."; eSt.classList.add("err"); return; }
+        eSave.disabled=true; eSt.textContent="Se salvează...";
+        fetch(WD_API+"?cid="+encodeURIComponent(CID),{
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({dataNuntii:v})
+        })
+        .then(function(r){return r.json();})
+        .then(function(j){
+          eSave.disabled=false;
+          if(j&&(j.ok||j.salvat)){
+            var t=new Date(); t.setHours(0,0,0,0);
+            var w=new Date(v+"T00:00:00");
+            d.dataNuntii=v;
+            d.zileRamase=Math.max(0, Math.round((w-t)/86400000));
+            render(d);
+          } else { eSt.textContent="Nu s-a salvat. Mai încearcă."; eSt.classList.add("err"); }
+        })
+        .catch(function(){ eSave.disabled=false; eSt.textContent="Eroare de conexiune. Mai încearcă."; eSt.classList.add("err"); });
+      };
+    }
   }
 
   function tool(key,ic,cls,title,desc,qs){
