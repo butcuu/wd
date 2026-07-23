@@ -676,5 +676,50 @@ html,body{margin:0;padding:0;height:auto;min-height:0;overflow-x:hidden;overflow
 })();
 </script>
 
+<!-- WD-NAV-TOP v1 - navigare la nivel de fereastra de sus.
+     Butoanele catre portal si catre checkout nu mai incarca pagina in interiorul
+     iframe-ului. Fara asta, pe mobil scroll-ul ramane parcat si pare pagina goala. -->
+<script>
+(function(){
+"use strict";
+if(window.__wdNavTop) return;
+window.__wdNavTop = 1;
+
+function goTop(url){
+  try{
+    if(window.top && window.top !== window){ window.top.location.href = url; return; }
+  }catch(e){}
+  location.href = url;
+}
+
+function isPortal(href){
+  return href.indexOf("clientclub.net") > -1 || href.indexOf("weddingdirection.ro") > -1;
+}
+
+function mark(){
+  var a = document.querySelectorAll("a[href]");
+  for(var i=0;i<a.length;i++){
+    var h = a[i].getAttribute("href") || "";
+    if(isPortal(h)) a[i].setAttribute("target","_top");
+  }
+}
+
+document.addEventListener("click", function(e){
+  var t = e.target;
+  var a = (t && t.closest) ? t.closest("a[href]") : null;
+  if(!a) return;
+  var h = a.getAttribute("href") || "";
+  if(!isPortal(h)) return;
+  e.preventDefault();
+  goTop(a.href);
+}, true);
+
+mark();
+if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", mark);
+setInterval(mark, 800);
+
+})();
+</script>
+
 </body>
 </html>
